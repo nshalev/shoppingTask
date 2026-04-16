@@ -1,0 +1,1911 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Shopping Game (v3)</title>
+<style>
+  /* ===== Reset & base ===== */
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; width: 100%; overflow: hidden; user-select: none; -webkit-user-select: none; touch-action: manipulation; }
+  body {
+    font-family: 'Quicksand', 'Avenir Next', 'Helvetica Neue', sans-serif;
+    background: #2a3a4a; color: #f5f0e8;
+    display: flex; align-items: center; justify-content: center; font-size: 20px;
+  }
+
+  /* ===== Layout ===== */
+  #app {
+    width: 100vw; height: 100vh; height: 100dvh;
+    position: relative; overflow: hidden;
+  }
+  .screen {
+    position: absolute; inset: 0; display: none;
+    flex-direction: column; align-items: center; justify-content: center;
+    padding: 24px; overflow: hidden;
+  }
+  .screen.active { display: flex; }
+
+  /* ===== Cards & buttons ===== */
+  .card {
+    background: #f5f0e8; color: #2a3a4a;
+    border-radius: 24px; padding: 32px 44px;
+    max-width: 760px; max-height: 92vh; max-height: 92dvh;
+    overflow-y: auto;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+  }
+  .card h1 { font-size: 32px; margin-bottom: 18px; color: #c4633a; }
+  .card h2 { font-size: 22px; margin: 18px 0 10px 0; color: #4a8a5c; border-bottom: 2px solid #ddd; padding-bottom: 4px; }
+  .card p { font-size: 18px; line-height: 1.5; margin-bottom: 12px; }
+  .card.text-center { text-align: center; }
+
+  .big-btn {
+    background: #c4633a; color: white; border: none;
+    padding: 16px 38px; border-radius: 50px; font-size: 22px; font-weight: bold;
+    cursor: pointer; margin-top: 12px; font-family: inherit;
+    box-shadow: 0 4px 0 #8a4528;
+    transition: transform 0.08s, box-shadow 0.08s;
+  }
+  .big-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #8a4528; }
+  .big-btn.green { background: #4a8a5c; box-shadow: 0 4px 0 #2f5a3c; }
+  .big-btn.green:active { box-shadow: 0 2px 0 #2f5a3c; }
+  .big-btn.red { background: #c4423a; box-shadow: 0 4px 0 #8a2c25; }
+  .big-btn.red:active { box-shadow: 0 2px 0 #8a2c25; }
+  .big-btn.gray { background: #888; box-shadow: 0 4px 0 #555; }
+  .big-btn.gray:active { box-shadow: 0 2px 0 #555; }
+  .big-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .small-btn {
+    padding: 8px 16px; font-size: 16px; border-radius: 30px;
+    background: #888; color: white; border: none; cursor: pointer; font-family: inherit;
+    box-shadow: 0 2px 0 #555;
+  }
+  .small-btn:active { transform: translateY(1px); box-shadow: 0 1px 0 #555; }
+
+  /* ===== Config screen ===== */
+  .config-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px 20px;
+    align-items: center;
+  }
+  .config-grid label { font-weight: 600; }
+  .config-grid input[type="number"], .config-grid input[type="text"], .config-grid select {
+    padding: 8px 10px; border: 2px solid #ccc; border-radius: 8px;
+    font-size: 16px; font-family: inherit; width: 100%;
+  }
+  .config-row-full { grid-column: 1 / -1; }
+  .config-checkbox-row { display: flex; align-items: center; gap: 10px; }
+  .config-checkbox-row input[type="checkbox"] {
+    width: 22px; height: 22px; cursor: pointer;
+  }
+  .help-text { font-size: 14px; color: #666; font-style: italic; }
+  .config-buttons { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; }
+  .toggle-display { display: none; }
+  .toggle-display.shown { display: contents; }
+
+  /* ===== Game screen ===== */
+  #game-screen {
+    padding: 0; background: #2a3a4a;
+    align-items: stretch; justify-content: flex-start;
+  }
+  .topbar {
+    height: 60px; flex-shrink: 0; width: 100%;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px; background: rgba(0,0,0,0.25);
+  }
+  .topbar-left, .topbar-right { display: flex; align-items: center; gap: 12px; }
+  .stars-display { display: flex; align-items: center; gap: 10px; font-size: 26px; font-weight: bold; }
+  .stars-display .star-icon { font-size: 32px; color: #f5c542; }
+  .trial-info { font-size: 14px; opacity: 0.7; padding-left: 14px; border-left: 1px solid rgba(255,255,255,0.2); }
+  .cart-btn {
+    background: #f5c542; border: none; border-radius: 14px;
+    padding: 8px 18px; font-size: 24px; cursor: pointer;
+    box-shadow: 0 3px 0 #b89328; font-family: inherit;
+  }
+  .cart-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #b89328; }
+  .terminate-btn {
+    background: rgba(196, 66, 58, 0.7); color: white; border: none;
+    border-radius: 8px; padding: 6px 12px; font-size: 13px; cursor: pointer;
+    font-family: inherit;
+  }
+  .terminate-btn:active { transform: translateY(1px); }
+
+  /* ===== Store grid (adaptive) ===== */
+  #store-area {
+    flex: 1 1 auto; min-height: 0;
+    display: flex; flex-direction: column;
+    padding: 12px; gap: 8px; width: 100%; overflow: hidden;
+  }
+  #store-grid {
+    flex: 1 1 auto; min-height: 0;
+    display: grid;
+    gap: 6px;
+    /* rows and cols set dynamically via inline style */
+  }
+  .item-cell {
+    background: #f5f0e8; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; position: relative;
+    transition: transform 0.1s; overflow: hidden;
+    min-width: 0; min-height: 0;
+    padding: 4px;
+    box-shadow: 0 2px 0 rgba(0,0,0,0.2);
+  }
+  .item-cell.shelf-bg {
+    background: linear-gradient(to bottom, #f5f0e8 0%, #e8dfc8 100%);
+    border: 2px solid rgba(138, 90, 43, 0.3);
+  }
+  .item-cell:active { transform: scale(0.95); }
+  .item-cell.picked { opacity: 0.25; pointer-events: none; }
+
+  /* ===== List view ===== */
+  #list-area {
+    flex: 1 1 auto; min-height: 0;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 12px; gap: 10px; width: 100%; overflow: hidden;
+  }
+  .list-frame {
+    flex: 1 1 auto; min-height: 0;
+    width: min(620px, 95%); max-width: 95%;
+    border-radius: 18px; padding: 16px;
+    display: flex; flex-direction: column; position: relative;
+  }
+  .list-frame.clipboard {
+    background: #d9b380; border: 6px solid #8a5a2b;
+    box-shadow: inset 0 0 0 3px #c49a64, 0 6px 0 rgba(0,0,0,0.2);
+  }
+  .list-frame.clipboard::before {
+    content: ''; position: absolute; top: -22px; left: 50%; transform: translateX(-50%);
+    width: 80px; height: 24px; background: #555; border-radius: 6px 6px 2px 2px;
+  }
+  .list-frame.tablet {
+    background: #1a1a1f; border: 8px solid #2a2a30;
+    border-radius: 24px; box-shadow: 0 6px 0 rgba(0,0,0,0.3);
+  }
+  .list-frame.tablet::after {
+    content: ''; position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
+    width: 28px; height: 28px; border-radius: 50%; border: 2px solid #444;
+  }
+  .list-grid {
+    flex: 1 1 auto; min-height: 0;
+    background: #f5f0e8; border-radius: 8px;
+    padding: 12px; display: grid; gap: 8px;
+    /* grid-template-rows/cols set dynamically */
+  }
+  .list-frame.tablet .list-grid {
+    background: #f0ede5; border-radius: 4px;
+  }
+  .list-item {
+    background: white; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+    min-width: 0; min-height: 0; padding: 4px;
+  }
+  .list-item.crossed::after {
+    content: ''; position: absolute; left: 6%; right: 6%; top: 48%;
+    height: 4px; background: #c4633a; border-radius: 2px;
+    transform: rotate(-8deg);
+  }
+
+  /* ===== Toggle row ===== */
+  .toggle-btn-row {
+    display: flex; justify-content: center; padding: 6px;
+    flex-shrink: 0;
+  }
+  .toggle-btn {
+    background: #f5c542; border: none; border-radius: 14px;
+    padding: 12px 30px; font-size: 20px; font-weight: bold; cursor: pointer;
+    box-shadow: 0 4px 0 #b89328;
+    display: flex; align-items: center; gap: 12px; font-family: inherit;
+  }
+  .toggle-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #b89328; }
+
+  /* ===== Overlays ===== */
+  #feedback-overlay, #terminate-overlay {
+    position: absolute; inset: 0; background: rgba(0,0,0,0.6);
+    display: none; align-items: center; justify-content: center; z-index: 100;
+  }
+  #feedback-overlay.active, #terminate-overlay.active { display: flex; }
+  .overlay-card {
+    background: #f5f0e8; color: #2a3a4a; border-radius: 24px;
+    padding: 32px 50px; text-align: center; max-width: 500px;
+  }
+  .overlay-card .big-stars { font-size: 56px; color: #f5c542; margin: 16px 0; }
+  .overlay-card h2 { font-size: 28px; margin-bottom: 12px; color: #c4633a; }
+  .overlay-buttons { display: flex; gap: 16px; justify-content: center; margin-top: 16px; }
+
+  /* ===== Pick feedback (floating +/-) ===== */
+  .pick-fb {
+    position: absolute; font-size: 44px; font-weight: bold;
+    pointer-events: none; z-index: 50;
+    animation: floatUp 0.9s ease-out forwards;
+  }
+  .pick-fb.good { color: #4a8a5c; }
+  .pick-fb.bad { color: #c4423a; }
+  @keyframes floatUp {
+    0% { transform: translate(-50%, 0) scale(0.5); opacity: 1; }
+    100% { transform: translate(-50%, -120px) scale(1.3); opacity: 0; }
+  }
+
+  /* ===== Metacognition ===== */
+  .meta-question { font-size: 26px; margin-bottom: 24px; text-align: center; max-width: 700px; line-height: 1.4; }
+  .meta-choices { display: flex; gap: 30px; justify-content: center; align-items: center; flex-wrap: wrap; }
+  .meta-choice {
+    background: #f5f0e8; border-radius: 18px; padding: 20px;
+    cursor: pointer; border: 4px solid transparent;
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+    width: 200px;
+    transition: transform 0.1s, border-color 0.1s;
+  }
+  .meta-choice:active { transform: scale(0.95); }
+  .meta-choice.selected { border-color: #f5c542; }
+  .meta-choice .label { color: #2a3a4a; font-size: 18px; font-weight: bold; }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ============ CONFIG SCREEN ============ -->
+  <div id="config-screen" class="screen active">
+    <div class="card">
+      <h1>Shopping Game — Configuration</h1>
+
+      <h2>Participant</h2>
+      <div class="config-grid">
+        <label>Participant ID:</label>
+        <input type="text" id="cfg-pid" value="">
+        <label>Session number:</label>
+        <input type="number" id="cfg-session" value="1" min="1">
+        <label>Age (years):</label>
+        <input type="number" id="cfg-age" value="" min="0" step="0.1">
+        <label>Notes (optional):</label>
+        <input type="text" id="cfg-notes" value="" placeholder="any extra info">
+      </div>
+
+      <h2>Task parameters</h2>
+      <div class="config-grid">
+        <label>Items on shopping list:</label>
+        <input type="number" id="cfg-list-size" value="6" min="2" max="8">
+
+        <label>Search array size:</label>
+        <select id="cfg-array-mode">
+          <option value="fixed">Fixed</option>
+          <option value="variable">Variable (alternates)</option>
+        </select>
+
+        <div class="toggle-display shown" id="cfg-fixed-row">
+          <label>&nbsp;&nbsp;Array size (fixed):</label>
+          <input type="number" id="cfg-array-size" value="20" min="12" max="24">
+        </div>
+        <div class="toggle-display" id="cfg-variable-row">
+          <label>&nbsp;&nbsp;Low load:</label>
+          <input type="number" id="cfg-array-low" value="12" min="12" max="24">
+          <label>&nbsp;&nbsp;High load:</label>
+          <input type="number" id="cfg-array-high" value="24" min="12" max="24">
+        </div>
+
+        <label>Targets to find per trial:</label>
+        <input type="number" id="cfg-targets" value="6" min="1" max="8">
+
+        <label>Shuffle <strong>list</strong> every N visits:</label>
+        <input type="number" id="cfg-list-shuffle-n" value="0" min="0" max="20">
+        <div class="config-row-full help-text">
+          0 = never shuffle list. 1 = shuffle on every list visit (after the first). 2 = every 2nd visit. 3 = every 3rd. Etc.
+        </div>
+        <label>Shuffle <strong>store</strong> every N visits:</label>
+        <input type="number" id="cfg-store-shuffle-n" value="0" min="0" max="20">
+        <div class="config-row-full help-text">
+          0 = never shuffle store. 1 = shuffle on every return from list. 2 = every 2nd return. Etc. Tests memory for item identity vs. spatial location.
+        </div>
+      </div>
+
+      <h2>Conditions (reliability manipulation)</h2>
+      <div class="config-grid">
+        <div class="config-row-full config-checkbox-row">
+          <input type="checkbox" id="cfg-include-reliable" checked>
+          <label for="cfg-include-reliable">Include RELIABLE condition</label>
+        </div>
+        <div class="config-row-full config-checkbox-row">
+          <input type="checkbox" id="cfg-include-unreliable" checked>
+          <label for="cfg-include-unreliable">Include UNRELIABLE condition</label>
+        </div>
+
+        <label>Design:</label>
+        <select id="cfg-design">
+          <option value="blocked">Blocked (one condition, then the other)</option>
+          <option value="mixed">Mixed (trials interleaved randomly)</option>
+        </select>
+
+        <label>Block order (if blocked):</label>
+        <select id="cfg-block-order">
+          <option value="counterbalanced">Counterbalanced (auto by PID)</option>
+          <option value="reliable_first">Reliable first</option>
+          <option value="unreliable_first">Unreliable first</option>
+        </select>
+
+        <label>Reliable: # test trials:</label>
+        <input type="number" id="cfg-reliable-trials" value="3" min="1" max="20">
+        <label>Reliable: # practice:</label>
+        <input type="number" id="cfg-reliable-practice" value="1" min="0" max="5">
+
+        <label>Unreliable: # test trials:</label>
+        <input type="number" id="cfg-unreliable-trials" value="6" min="1" max="30">
+        <label>Unreliable: # practice:</label>
+        <input type="number" id="cfg-unreliable-practice" value="2" min="0" max="5">
+
+        <label>Unreliable schedule:</label>
+        <select id="cfg-schedule">
+          <option value="countdown">Countdown timer (default)</option>
+          <option value="permanent">Permanent (original paper: disappear & never return)</option>
+          <option value="everyNth">Every-Nth: visible on 1, N+1, 2N+1...</option>
+          <option value="outage">Outage: disappears after N, returns after M trips</option>
+        </select>
+
+        <div class="config-row-full help-text">
+          Controls how the unreliable list behaves. Countdown makes list-checking "costly" but never impossible.
+        </div>
+
+        <!-- Countdown params -->
+        <div class="toggle-display shown" id="cfg-sched-countdown">
+          <label>&nbsp;&nbsp;Countdown (seconds):</label>
+          <input type="number" id="cfg-countdown-sec" value="3" min="1" max="60" step="0.5">
+        </div>
+
+        <!-- Permanent (original paper) params -->
+        <div class="toggle-display" id="cfg-sched-permanent">
+          <label>&nbsp;&nbsp;Disappear after N visits:</label>
+          <select id="cfg-permanent-n">
+            <option value="1">1</option>
+            <option value="2" selected>2</option>
+            <option value="mixed">Mixed (1 or 2, randomized)</option>
+          </select>
+        </div>
+
+        <!-- Every-Nth params -->
+        <div class="toggle-display" id="cfg-sched-everyNth">
+          <label>&nbsp;&nbsp;Blank every N visits:</label>
+          <input type="number" id="cfg-everyNth-n" value="2" min="2" max="10">
+        </div>
+
+        <!-- Outage params -->
+        <div class="toggle-display" id="cfg-sched-outage">
+          <label>&nbsp;&nbsp;Disappear after N visits:</label>
+          <input type="number" id="cfg-outage-disappear" value="1" min="1" max="10">
+          <label>&nbsp;&nbsp;Return after M more trips:</label>
+          <input type="number" id="cfg-outage-return" value="2" min="1" max="10">
+        </div>
+
+        <label>List opacity jitter (unreliable):</label>
+        <select id="cfg-opacity-jitter">
+          <option value="on">On (50–100%)</option>
+          <option value="off">Off (always 100%)</option>
+        </select>
+      </div>
+
+      <h2>Other</h2>
+      <div class="config-grid">
+        <label>Stimulus folder:</label>
+        <input type="text" id="cfg-stim-dir" value="stimuli/">
+        <div class="config-row-full help-text">
+          Path (relative to this HTML file) where image files live. Auto-discovers <code>1.jpg</code>, <code>01.jpg</code>, etc.
+        </div>
+
+        <div class="config-row-full config-checkbox-row">
+          <input type="checkbox" id="cfg-meta-questions" checked>
+          <label for="cfg-meta-questions">Show metacognition questions at end</label>
+        </div>
+        <div class="config-row-full config-checkbox-row">
+          <input type="checkbox" id="cfg-fullscreen" checked>
+          <label for="cfg-fullscreen">Try to enter fullscreen on Start</label>
+        </div>
+      </div>
+
+      <div class="config-buttons">
+        <button class="small-btn" onclick="loadConfigFromStorage()">Load last config</button>
+        <button class="big-btn green" onclick="startFromConfig()">Start Experiment →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ BLOCK INTRO ============ -->
+  <div id="block-intro-screen" class="screen">
+    <div class="card text-center">
+      <h1 id="block-intro-title">Get Ready!</h1>
+      <div id="block-intro-frame" style="margin: 20px auto;"></div>
+      <p id="block-intro-text">Instructions go here.</p>
+      <button class="big-btn green" onclick="startBlock()">Let's go!</button>
+    </div>
+  </div>
+
+  <!-- ============ TRIAL INTRO ============ -->
+  <div id="trial-intro-screen" class="screen">
+    <div class="card text-center" style="padding: 24px 40px;">
+      <div id="trial-intro-frame" style="margin: 12px auto;"></div>
+      <p id="trial-intro-text" style="font-size: 22px;">Get ready!</p>
+      <button class="big-btn" onclick="startTrial()">Go shopping!</button>
+    </div>
+  </div>
+
+  <!-- ============ GAME SCREEN ============ -->
+  <div id="game-screen" class="screen">
+    <div class="topbar">
+      <div class="topbar-left">
+        <div class="stars-display">
+          <span class="star-icon">★</span>
+          <span id="star-count">0</span>
+        </div>
+        <div class="trial-info" id="trial-info-display"></div>
+      </div>
+      <div class="topbar-right">
+        <button class="terminate-btn" onclick="confirmTerminate()">⏹ End Session</button>
+        <button class="cart-btn" onclick="endTrialEarly()">🛒 Done</button>
+      </div>
+    </div>
+
+    <!-- Store view -->
+    <div id="store-area">
+      <div id="store-grid"></div>
+      <div class="toggle-btn-row">
+        <button class="toggle-btn" onclick="goToList()">
+          <span id="store-toggle-frame"></span>
+          See my list
+        </button>
+      </div>
+    </div>
+
+    <!-- List view -->
+    <div id="list-area" style="display:none;">
+      <div class="list-frame" id="list-frame">
+        <div class="list-grid" id="list-grid"></div>
+      </div>
+      <div class="toggle-btn-row">
+        <button class="toggle-btn" onclick="goToStore()">← Back to store</button>
+      </div>
+    </div>
+
+    <!-- Trial-end feedback -->
+    <div id="feedback-overlay">
+      <div class="overlay-card">
+        <h2>Trial complete!</h2>
+        <div class="big-stars">★★★</div>
+        <p id="feedback-stars-text">You earned 6 stars!</p>
+        <button class="big-btn green" onclick="nextTrial()">Next</button>
+      </div>
+    </div>
+
+    <!-- Terminate confirm -->
+    <div id="terminate-overlay">
+      <div class="overlay-card">
+        <h2>End session?</h2>
+        <p>This will save all data so far and return to the configuration screen.</p>
+        <div class="overlay-buttons">
+          <button class="big-btn gray" onclick="cancelTerminate()">Cancel</button>
+          <button class="big-btn red" onclick="doTerminate()">End Session</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ METACOGNITION ============ -->
+  <div id="meta-screen" class="screen">
+    <p class="meta-question" id="meta-question-text">Which game did you think was easier?</p>
+    <div class="meta-choices" id="meta-choices"></div>
+    <button class="big-btn green" id="meta-submit" style="margin-top: 24px; opacity: 0.4;" disabled onclick="submitMeta()">Next</button>
+  </div>
+
+  <!-- ============ DONE ============ -->
+  <div id="done-screen" class="screen">
+    <div class="card text-center">
+      <h1>All done — great job!</h1>
+      <div style="font-size: 64px; color: #f5c542; margin: 16px 0;">★★★★★</div>
+      <p>Thank you for playing the Shopping Game!</p>
+      <p id="done-pid-display" style="font-size: 14px; color: #888; margin-top: 16px;"></p>
+      <p id="done-status" style="font-size: 14px; color: #4a8a5c; margin-top: 8px;"></p>
+      <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 16px;">
+        <button class="big-btn" onclick="downloadAllCSVs()">Download CSVs</button>
+        <button class="big-btn green" onclick="returnToConfig()">New Session</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* =========================================================================
+   SHOPPING GAME v3
+   Configurable parameterization + multi-CSV export + terminate flow
+   ========================================================================= */
+
+// ============ DEFAULTS / CONFIG STORAGE ============
+const CONFIG_STORAGE_KEY = 'shoppingGameConfig_v3';
+
+// Build the runtime config object from the form values
+function readConfigFromForm() {
+  return {
+    participantId: document.getElementById('cfg-pid').value.trim() || 'P' + Date.now().toString(36).toUpperCase(),
+    session: parseInt(document.getElementById('cfg-session').value) || 1,
+    age: parseFloat(document.getElementById('cfg-age').value) || null,
+    notes: document.getElementById('cfg-notes').value.trim(),
+
+    listSize: parseInt(document.getElementById('cfg-list-size').value),
+    arrayMode: document.getElementById('cfg-array-mode').value,
+    arraySize: parseInt(document.getElementById('cfg-array-size').value),
+    arrayLow: parseInt(document.getElementById('cfg-array-low').value),
+    arrayHigh: parseInt(document.getElementById('cfg-array-high').value),
+    targetsPerTrial: parseInt(document.getElementById('cfg-targets').value),
+    listShuffleN: Math.max(0, parseInt(document.getElementById('cfg-list-shuffle-n').value) || 0),
+    storeShuffleN: Math.max(0, parseInt(document.getElementById('cfg-store-shuffle-n').value) || 0),
+
+    includeReliable: document.getElementById('cfg-include-reliable').checked,
+    includeUnreliable: document.getElementById('cfg-include-unreliable').checked,
+    design: document.getElementById('cfg-design').value,
+    blockOrderPref: document.getElementById('cfg-block-order').value,
+
+    reliableTestTrials: parseInt(document.getElementById('cfg-reliable-trials').value),
+    reliablePractice: parseInt(document.getElementById('cfg-reliable-practice').value),
+    unreliableTrials: parseInt(document.getElementById('cfg-unreliable-trials').value),
+    unreliablePractice: parseInt(document.getElementById('cfg-unreliable-practice').value),
+    schedule: document.getElementById('cfg-schedule').value,
+    countdownSec: parseFloat(document.getElementById('cfg-countdown-sec').value) || 3,
+    permanentN: document.getElementById('cfg-permanent-n').value,
+    everyNthN: parseInt(document.getElementById('cfg-everyNth-n').value) || 2,
+    outageDisappear: parseInt(document.getElementById('cfg-outage-disappear').value) || 1,
+    outageReturn: parseInt(document.getElementById('cfg-outage-return').value) || 2,
+    opacityJitter: document.getElementById('cfg-opacity-jitter').value === 'on',
+
+    stimDir: document.getElementById('cfg-stim-dir').value || 'stimuli/',
+    showMeta: document.getElementById('cfg-meta-questions').checked,
+    tryFullscreen: document.getElementById('cfg-fullscreen').checked,
+  };
+}
+
+function saveConfigToStorage(cfg) {
+  // Don't save participant-specific fields
+  const toSave = { ...cfg };
+  delete toSave.participantId;
+  delete toSave.notes;
+  try { localStorage.setItem(CONFIG_STORAGE_KEY, JSON.stringify(toSave)); } catch (e) {}
+}
+
+function loadConfigFromStorage() {
+  try {
+    const raw = localStorage.getItem(CONFIG_STORAGE_KEY);
+    if (!raw) { alert('No saved configuration found.'); return; }
+    const saved = JSON.parse(raw);
+    // Apply each field if present
+    const setters = {
+      session: v => document.getElementById('cfg-session').value = v,
+      age: v => document.getElementById('cfg-age').value = v ?? '',
+      listSize: v => document.getElementById('cfg-list-size').value = v,
+      arrayMode: v => { document.getElementById('cfg-array-mode').value = v; updateArrayModeDisplay(); },
+      arraySize: v => document.getElementById('cfg-array-size').value = v,
+      arrayLow: v => document.getElementById('cfg-array-low').value = v,
+      arrayHigh: v => document.getElementById('cfg-array-high').value = v,
+      targetsPerTrial: v => document.getElementById('cfg-targets').value = v,
+      listShuffleN: v => document.getElementById('cfg-list-shuffle-n').value = v,
+      storeShuffleN: v => document.getElementById('cfg-store-shuffle-n').value = v,
+      // Back-compat with old boolean fields
+      listShuffle: v => document.getElementById('cfg-list-shuffle-n').value = v ? 1 : 0,
+      storeShuffle: v => document.getElementById('cfg-store-shuffle-n').value = v ? 1 : 0,
+      includeReliable: v => document.getElementById('cfg-include-reliable').checked = v,
+      includeUnreliable: v => document.getElementById('cfg-include-unreliable').checked = v,
+      design: v => document.getElementById('cfg-design').value = v,
+      blockOrderPref: v => document.getElementById('cfg-block-order').value = v,
+      reliableTestTrials: v => document.getElementById('cfg-reliable-trials').value = v,
+      reliablePractice: v => document.getElementById('cfg-reliable-practice').value = v,
+      unreliableTrials: v => document.getElementById('cfg-unreliable-trials').value = v,
+      unreliablePractice: v => document.getElementById('cfg-unreliable-practice').value = v,
+      schedule: v => { document.getElementById('cfg-schedule').value = v; updateScheduleDisplay(); },
+      countdownSec: v => document.getElementById('cfg-countdown-sec').value = v,
+      permanentN: v => document.getElementById('cfg-permanent-n').value = v,
+      everyNthN: v => document.getElementById('cfg-everyNth-n').value = v,
+      outageDisappear: v => document.getElementById('cfg-outage-disappear').value = v,
+      outageReturn: v => document.getElementById('cfg-outage-return').value = v,
+      opacityJitter: v => document.getElementById('cfg-opacity-jitter').value = v ? 'on' : 'off',
+      // Back-compat with old config fields
+      unreliablePresent: v => document.getElementById('cfg-unreliable-trials').value =
+        (v || 0) + parseInt(document.getElementById('cfg-unreliable-trials').value || 0),
+      unreliableAbsent: () => {}, // old field — absorbed into unreliableTrials
+      stimDir: v => document.getElementById('cfg-stim-dir').value = v,
+      showMeta: v => document.getElementById('cfg-meta-questions').checked = v,
+      tryFullscreen: v => document.getElementById('cfg-fullscreen').checked = v,
+    };
+    for (const [k, fn] of Object.entries(setters)) {
+      if (k in saved) fn(saved[k]);
+    }
+  } catch (e) {
+    alert('Could not load saved config: ' + e.message);
+  }
+}
+
+function updateArrayModeDisplay() {
+  const mode = document.getElementById('cfg-array-mode').value;
+  document.getElementById('cfg-fixed-row').classList.toggle('shown', mode === 'fixed');
+  document.getElementById('cfg-variable-row').classList.toggle('shown', mode === 'variable');
+}
+document.getElementById('cfg-array-mode').addEventListener('change', updateArrayModeDisplay);
+
+function updateScheduleDisplay() {
+  const sched = document.getElementById('cfg-schedule').value;
+  document.getElementById('cfg-sched-countdown').classList.toggle('shown', sched === 'countdown');
+  document.getElementById('cfg-sched-permanent').classList.toggle('shown', sched === 'permanent');
+  document.getElementById('cfg-sched-everyNth').classList.toggle('shown', sched === 'everyNth');
+  document.getElementById('cfg-sched-outage').classList.toggle('shown', sched === 'outage');
+}
+document.getElementById('cfg-schedule').addEventListener('change', updateScheduleDisplay);
+
+// Auto-fill default participant ID
+document.getElementById('cfg-pid').value = 'P' + Date.now().toString(36).toUpperCase();
+
+// ============ STATE ============
+let cfg = null;        // runtime config (set when experiment starts)
+const state = {
+  sessionStart: null,
+  blockOrder: [],          // e.g., ['reliable', 'unreliable']
+  trialPlan: [],           // flattened list of all trials to run
+  currentTrialIdx: 0,
+  currentTrialDef: null,
+  currentView: 'store',
+  trialData: null,
+  allTrialRecords: [],     // one record per completed trial
+  encodingLog: [],         // one row per list-visit (trip)
+  shoppingLog: [],         // one row per pick
+  metaResponses: {},
+  starsThisTrial: 0,
+  storeItems: [],
+  listItems: [],
+  picksThisVisit: 0,
+  visitStartTime: null,
+  pickRtRef: null,         // reference time for next pick's RT (set when entering store)
+  listVisible: false,
+  tripsThisTrial: 0,
+  tripStartTime: null,
+  stimulusPool: [],
+  availableStimuli: [],
+  blockStoreItems: null,   // cache so layout is stable within a block
+  arraySizeForTrial: null, // resolved size for the current trial
+  metaStep: 0,
+};
+
+// ============ STIMULUS DISCOVERY ============
+const AUTO_DISCOVER_PATTERNS = [
+  i => `${i}.jpg`, i => `${i}.png`,
+  i => `${String(i).padStart(2,'0')}.jpg`, i => `${String(i).padStart(3,'0')}.jpg`,
+  i => `noun${String(i).padStart(2,'0')}.jpg`, i => `Object${i}.jpg`,
+];
+const AUTO_DISCOVER_MAX = 80;
+
+function tryLoadImage(src) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => resolve({ src, ok: true });
+    img.onerror = () => resolve({ src, ok: false });
+    img.src = src;
+  });
+}
+
+async function discoverStimuli() {
+  const found = new Set();
+  const candidates = [];
+  for (let i = 1; i <= AUTO_DISCOVER_MAX; i++) {
+    for (const fn of AUTO_DISCOVER_PATTERNS) {
+      candidates.push(cfg.stimDir + fn(i));
+    }
+  }
+  // Dedup candidate URLs first so we don't waste loads
+  const uniqueCandidates = Array.from(new Set(candidates));
+  const checks = await Promise.all(uniqueCandidates.map(tryLoadImage));
+  const seenIdx = new Set();
+  const seenFiles = new Set();
+  for (const c of checks) {
+    if (!c.ok) continue;
+    const filename = c.src.split('/').pop();
+    // Skip exact filename duplicates (defensive)
+    if (seenFiles.has(filename)) continue;
+    const m = c.src.match(/(\d+)\.[a-zA-Z]+$/);
+    const idx = m ? parseInt(m[1], 10) : null;
+    // Skip if we already have an image with the same numeric index
+    if (idx !== null && seenIdx.has(idx)) continue;
+    if (idx !== null) seenIdx.add(idx);
+    seenFiles.add(filename);
+    found.add(c.src);
+  }
+  state.availableStimuli = Array.from(found).sort();
+  console.log(`Discovered ${state.availableStimuli.length} unique stimuli in ${cfg.stimDir}:`,
+    state.availableStimuli.map(s => s.split('/').pop()));
+  return state.availableStimuli;
+}
+
+function buildStimulusPool(nNeeded) {
+  // Always return UNIQUE items only. Never duplicate.
+  // If we have fewer images than nNeeded, return all that we have; the
+  // sufficiency check in startFromConfig will have already warned the user.
+  const unique = [...state.availableStimuli];
+  shuffle(unique);
+  return unique.slice(0, Math.min(nNeeded, unique.length)).map((src, i) => ({
+    id: 'item' + i, src, filename: src.split('/').pop()
+  }));
+}
+
+function generateItemHTML(item) {
+  return `<img src="${item.src}" alt="" draggable="false" style="width:100%;height:100%;object-fit:contain;pointer-events:none;">`;
+}
+
+// ============ UTILITIES ============
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function tryFullscreen() {
+  const el = document.documentElement;
+  if (el.requestFullscreen) el.requestFullscreen().catch(() => {});
+  else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+  if (screen.orientation && screen.orientation.lock) {
+    screen.orientation.lock('landscape').catch(() => {});
+  }
+}
+
+// Adaptive grid dimensions for the store
+function gridDimensions(n) {
+  // Canonical per-spec
+  const canonical = {
+    12: { rows: 3, cols: 4 }, 15: { rows: 3, cols: 5 }, 16: { rows: 4, cols: 4 },
+    18: { rows: 3, cols: 6 }, 20: { rows: 4, cols: 5 }, 21: { rows: 3, cols: 7 },
+    24: { rows: 4, cols: 6 },
+  };
+  if (canonical[n]) return canonical[n];
+  // Otherwise prefer 3 rows for n ≤ 21, else 4 rows
+  const rows = n <= 21 ? 3 : 4;
+  const cols = Math.ceil(n / rows);
+  return { rows, cols };
+}
+
+// Adaptive grid for list (2-8 items)
+function listGridDimensions(n) {
+  const map = {
+    2: { rows: 1, cols: 2 }, 3: { rows: 1, cols: 3 }, 4: { rows: 2, cols: 2 },
+    5: { rows: 2, cols: 3 }, 6: { rows: 2, cols: 3 }, 7: { rows: 2, cols: 4 },
+    8: { rows: 2, cols: 4 },
+  };
+  return map[n] || { rows: Math.ceil(n / 4), cols: 4 };
+}
+
+// ============ AUDIO ============
+let audioCtx = null;
+function ensureAudio() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+}
+function playTone(freq, duration, type = 'sine', volume = 0.2) {
+  if (!audioCtx) return;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = type; osc.frequency.value = freq; gain.gain.value = volume;
+  gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+  osc.connect(gain).connect(audioCtx.destination);
+  osc.start(); osc.stop(audioCtx.currentTime + duration);
+}
+function playCorrectSound() {
+  playTone(660, 0.12, 'sine', 0.25);
+  setTimeout(() => playTone(880, 0.18, 'sine', 0.25), 90);
+}
+function playIncorrectSound() { playTone(180, 0.25, 'square', 0.18); }
+function playStarSound() {
+  playTone(880, 0.08, 'triangle', 0.2);
+  setTimeout(() => playTone(1320, 0.15, 'triangle', 0.2), 60);
+}
+
+// ============ FRAME ICONS ============
+function frameIconHTML(type, size = 60) {
+  const w = size, h = size * 1.25;
+  if (type === 'reliable') {
+    return `<svg width="${w}" height="${h}" viewBox="0 0 60 75">
+      <rect x="20" y="0" width="20" height="6" rx="2" fill="#555"/>
+      <rect x="2" y="5" width="56" height="68" rx="6" fill="#d9b380" stroke="#8a5a2b" stroke-width="3"/>
+      <rect x="8" y="15" width="44" height="3" rx="1" fill="#8a5a2b" opacity="0.5"/>
+      <rect x="8" y="22" width="36" height="3" rx="1" fill="#8a5a2b" opacity="0.5"/>
+      <rect x="8" y="29" width="40" height="3" rx="1" fill="#8a5a2b" opacity="0.5"/>
+      <rect x="8" y="36" width="32" height="3" rx="1" fill="#8a5a2b" opacity="0.5"/>
+    </svg>`;
+  } else {
+    return `<svg width="${w}" height="${h}" viewBox="0 0 60 75">
+      <rect x="2" y="2" width="56" height="71" rx="8" fill="#1a1a1f" stroke="#2a2a30" stroke-width="2"/>
+      <rect x="6" y="8" width="48" height="55" rx="2" fill="#f0ede5"/>
+      <circle cx="30" cy="68" r="3" fill="none" stroke="#444" stroke-width="1.5"/>
+      <rect x="10" y="14" width="32" height="3" rx="1" fill="#999"/>
+      <rect x="10" y="21" width="26" height="3" rx="1" fill="#999"/>
+      <rect x="10" y="28" width="30" height="3" rx="1" fill="#999"/>
+    </svg>`;
+  }
+}
+
+/**
+ * Compute whether the list should be visible on a given trip, given the trial's
+ * schedule and trip number. Returns { visible: bool, reason: string }.
+ * Called for unreliable trials only.
+ */
+function computeListVisibility(trial, tripNum) {
+  const sched = trial.schedule;
+  if (sched === 'permanent') {
+    // visible on trips 1..disappearAfter; blank from (disappearAfter+1) onwards
+    return { visible: tripNum <= trial.disappearAfter, reason: sched };
+  }
+  if (sched === 'everyNth') {
+    // visible on trips 1, N+1, 2N+1, ...; blank in between
+    // Equivalently: blank if (tripNum - 1) % N !== 0
+    const N = trial.blankEvery;
+    return { visible: ((tripNum - 1) % N) === 0, reason: sched };
+  }
+  if (sched === 'outage') {
+    // visible on trips 1..disappearAfter; blank for outageReturn trips;
+    // then visible again; blank again after another disappearAfter, etc. (repeating outage)
+    // Simpler: one outage episode per trial. Blank on trips (disappearAfter+1)..(disappearAfter+outageReturn),
+    // visible on trips before and after that window.
+    const D = trial.outageDisappear;
+    const R = trial.outageReturn;
+    const inOutage = tripNum > D && tripNum <= D + R;
+    return { visible: !inOutage, reason: sched };
+  }
+  // countdown handled separately (requires time, not just trip number)
+  return { visible: true, reason: 'unknown' };
+}
+
+// ============ TRIAL PLANNING ============
+// Build the full sequence of trials based on config.
+function buildTrialPlan() {
+  const trials = [];
+
+  // Determine which conditions are included
+  const conds = [];
+  if (cfg.includeReliable) conds.push('reliable');
+  if (cfg.includeUnreliable) conds.push('unreliable');
+  if (conds.length === 0) {
+    alert('No conditions selected. Please include at least one condition.');
+    return null;
+  }
+
+  // Build per-condition trial sets (practice + test trials)
+  function buildReliableTrials(isPractice) {
+    const n = isPractice ? cfg.reliablePractice : cfg.reliableTestTrials;
+    return Array.from({ length: n }, () => ({
+      condition: 'reliable', schedule: 'reliable', isPractice
+    }));
+  }
+  function buildUnreliableTrials(isPractice) {
+    const n = isPractice ? cfg.unreliablePractice : cfg.unreliableTrials;
+    const trials = [];
+    for (let i = 0; i < n; i++) {
+      const trial = {
+        condition: 'unreliable',
+        schedule: cfg.schedule,
+        isPractice,
+      };
+      // Schedule-specific per-trial parameters
+      if (cfg.schedule === 'permanent') {
+        if (cfg.permanentN === 'mixed') {
+          trial.disappearAfter = 1 + (i % 2);  // alternate 1 and 2
+        } else {
+          trial.disappearAfter = parseInt(cfg.permanentN);
+        }
+      } else if (cfg.schedule === 'everyNth') {
+        trial.blankEvery = cfg.everyNthN;
+      } else if (cfg.schedule === 'outage') {
+        trial.outageDisappear = cfg.outageDisappear;
+        trial.outageReturn = cfg.outageReturn;
+      } else if (cfg.schedule === 'countdown') {
+        trial.countdownSec = cfg.countdownSec;
+      }
+      trials.push(trial);
+    }
+    return trials;
+  }
+
+  if (cfg.design === 'blocked') {
+    // Determine block order
+    let order = conds;
+    if (conds.length === 2) {
+      if (cfg.blockOrderPref === 'counterbalanced') {
+        const parity = cfg.participantId.charCodeAt(cfg.participantId.length - 1) % 2;
+        order = parity === 0 ? ['reliable', 'unreliable'] : ['unreliable', 'reliable'];
+      } else if (cfg.blockOrderPref === 'reliable_first') {
+        order = ['reliable', 'unreliable'];
+      } else if (cfg.blockOrderPref === 'unreliable_first') {
+        order = ['unreliable', 'reliable'];
+      }
+    }
+    state.blockOrder = order;
+
+    for (const cond of order) {
+      const practice = (cond === 'reliable')
+        ? buildReliableTrials(true) : buildUnreliableTrials(true);
+      const test = (cond === 'reliable')
+        ? buildReliableTrials(false) : buildUnreliableTrials(false);
+      // Shuffle test trials within block (so absent/present positions vary)
+      shuffle(test);
+      trials.push({ blockBoundary: true, condition: cond });
+      trials.push(...practice);
+      trials.push(...test);
+    }
+  } else {
+    // Mixed design: pool all trials together, shuffle
+    state.blockOrder = conds;
+    const allPractice = [];
+    const allTest = [];
+    for (const cond of conds) {
+      if (cond === 'reliable') {
+        allPractice.push(...buildReliableTrials(true));
+        allTest.push(...buildReliableTrials(false));
+      } else {
+        allPractice.push(...buildUnreliableTrials(true));
+        allTest.push(...buildUnreliableTrials(false));
+      }
+    }
+    shuffle(allPractice);
+    shuffle(allTest);
+    if (allPractice.length > 0) trials.push({ blockBoundary: true, condition: 'mixed-practice' });
+    trials.push(...allPractice);
+    trials.push({ blockBoundary: true, condition: 'mixed-test' });
+    trials.push(...allTest);
+  }
+
+  // Resolve array size for each actual trial (not boundary markers)
+  for (const t of trials) {
+    if (t.blockBoundary) continue;
+    if (cfg.arrayMode === 'fixed') {
+      t.arraySize = cfg.arraySize;
+    } else {
+      // alternating: random pick of low or high per trial
+      t.arraySize = Math.random() < 0.5 ? cfg.arrayLow : cfg.arrayHigh;
+    }
+    t.listSize = cfg.listSize;
+  }
+
+  // Assign sequential trial IDs
+  let tnum = 0;
+  for (const t of trials) {
+    if (!t.blockBoundary) { t.trialId = ++tnum; }
+  }
+
+  return trials;
+}
+
+// ============ EXPERIMENT START ============
+async function startFromConfig() {
+  cfg = readConfigFromForm();
+  saveConfigToStorage(cfg);
+
+  // Validate
+  if (!cfg.includeReliable && !cfg.includeUnreliable) {
+    alert('Select at least one condition.');
+    return;
+  }
+  if (cfg.targetsPerTrial > cfg.listSize) {
+    alert(`Targets per trial (${cfg.targetsPerTrial}) cannot exceed list size (${cfg.listSize}).`);
+    return;
+  }
+  if (cfg.listSize > Math.min(cfg.arraySize, cfg.arrayLow, cfg.arrayHigh)) {
+    if (cfg.arrayMode === 'fixed' && cfg.listSize > cfg.arraySize) {
+      alert(`List size (${cfg.listSize}) exceeds array size (${cfg.arraySize}).`); return;
+    }
+    if (cfg.arrayMode === 'variable' && cfg.listSize > cfg.arrayLow) {
+      alert(`List size (${cfg.listSize}) exceeds low load (${cfg.arrayLow}).`); return;
+    }
+  }
+
+  // Reset session state
+  state.sessionStart = Date.now();
+  state.allTrialRecords = [];
+  state.encodingLog = [];
+  state.shoppingLog = [];
+  state.metaResponses = {};
+  state.currentTrialIdx = 0;
+  state.blockStoreItems = null;
+
+  ensureAudio();
+  if (cfg.tryFullscreen) tryFullscreen();
+
+  // Show a loading overlay (don't wipe the config form so it's preserved for next session)
+  const loader = document.createElement('div');
+  loader.id = '__loader';
+  loader.style.cssText = 'position:fixed;inset:0;background:rgba(42,58,74,0.95);color:#f5f0e8;display:flex;align-items:center;justify-content:center;z-index:9999;font-size:24px;';
+  loader.innerHTML = '<div style="text-align:center"><h1 style="color:#c4633a;margin-bottom:12px">Loading stimuli…</h1><p>Just a moment.</p></div>';
+  document.body.appendChild(loader);
+
+  await discoverStimuli();
+  if (state.availableStimuli.length === 0) {
+    loader.innerHTML = `<div style="text-align:center;max-width:600px;padding:30px">
+      <h1 style="color:#c4633a">No images found</h1>
+      <p>Place stimulus images in the folder <code>${cfg.stimDir}</code> next to this HTML file.</p>
+      <p style="font-size:14px;opacity:0.7;margin-top:10px">Filenames like <code>1.jpg</code>, <code>01.jpg</code>, <code>noun01.jpg</code> are auto-detected.</p>
+      <button class="big-btn green" onclick="document.getElementById('__loader').remove()" style="margin-top:20px">Back</button>
+    </div>`;
+    return;
+  }
+
+  // Check we have enough unique images for the largest possible array
+  const maxArr = cfg.arrayMode === 'fixed' ? cfg.arraySize : cfg.arrayHigh;
+  if (state.availableStimuli.length < maxArr) {
+    loader.innerHTML = `<div style="text-align:center;max-width:600px;padding:30px">
+      <h1 style="color:#c4633a">Not enough images</h1>
+      <p>Your largest configured array size is <strong>${maxArr}</strong>, which requires that many unique images per trial.</p>
+      <p>Only <strong>${state.availableStimuli.length}</strong> unique images were found in <code>${cfg.stimDir}</code>.</p>
+      <p style="font-size:14px;opacity:0.7;margin-top:10px">Either reduce the array size or add more images to the folder.</p>
+      <button class="big-btn green" onclick="document.getElementById('__loader').remove()" style="margin-top:20px">Back</button>
+    </div>`;
+    return;
+  }
+
+  // Build trial plan
+  state.trialPlan = buildTrialPlan();
+  if (!state.trialPlan) {
+    loader.remove();
+    return;
+  }
+
+  // Build a stimulus pool large enough for the whole session
+  const conds = (cfg.includeReliable ? 1 : 0) + (cfg.includeUnreliable ? 1 : 0);
+  state.stimulusPool = buildStimulusPool(maxArr * Math.max(conds, 1));
+
+  loader.remove();
+  goToNextItem();
+}
+
+// ============ TRIAL FLOW ============
+function goToNextItem() {
+  if (state.currentTrialIdx >= state.trialPlan.length) {
+    // Done — show meta or finish
+    if (cfg.showMeta && state.blockOrder.length === 2) {
+      goToMeta();
+    } else {
+      finishSession();
+    }
+    return;
+  }
+  const item = state.trialPlan[state.currentTrialIdx];
+  if (item.blockBoundary) {
+    showBlockIntro(item);
+  } else {
+    state.currentTrialDef = item;
+    goToTrialIntro();
+  }
+}
+
+function showBlockIntro(boundary) {
+  const cond = boundary.condition;
+  let title, text, frameHTML = '';
+  if (cond === 'reliable') {
+    title = 'Clipboard Game';
+    text = "Your shopping list is on a CLIPBOARD. It will always be there when you check it. Find the items from the list in the store!";
+    frameHTML = frameIconHTML('reliable', 100);
+  } else if (cond === 'unreliable') {
+    title = 'Tablet Game';
+    // Tailor to the schedule
+    if (cfg.schedule === 'countdown') {
+      text = `Your shopping list is on a TABLET. After you peek at the list, the tablet needs ${cfg.countdownSec} seconds to reload before you can check it again. Try to remember as much as you can each time you look!`;
+    } else if (cfg.schedule === 'permanent') {
+      text = "Your shopping list is on a TABLET. The tablet's battery might die — sometimes the list will disappear and won't come back! Try to remember the items so you can still find them.";
+    } else if (cfg.schedule === 'everyNth') {
+      text = "Your shopping list is on a TABLET with a glitchy screen. Sometimes when you check it, the list is blank! Try to remember the items so you can still find them.";
+    } else if (cfg.schedule === 'outage') {
+      text = "Your shopping list is on a TABLET. The battery is weak — the list might go dark for a while, but it may come back later. Try to remember the items!";
+    } else {
+      text = "Your shopping list is on a TABLET. The list might not always be there — try to remember the items!";
+    }
+    frameHTML = frameIconHTML('unreliable', 100);
+  } else if (cond === 'mixed-practice') {
+    title = 'Practice';
+    text = "Now we'll try a few practice rounds. Sometimes the list will be on a clipboard and sometimes on a tablet. Watch for the icon at the start of each trial!";
+  } else if (cond === 'mixed-test') {
+    title = 'Real Game';
+    text = "Now the real game starts! Sometimes the list will be on a clipboard, sometimes on a tablet. Watch for the icon!";
+  }
+  document.getElementById('block-intro-title').textContent = title;
+  document.getElementById('block-intro-frame').innerHTML = frameHTML;
+  document.getElementById('block-intro-text').textContent = text;
+  showScreen('block-intro-screen');
+}
+
+function startBlock() {
+  state.currentTrialIdx++;  // advance past the block boundary marker
+  goToNextItem();
+}
+
+function goToTrialIntro() {
+  const t = state.currentTrialDef;
+  document.getElementById('trial-intro-frame').innerHTML = frameIconHTML(t.condition, 80);
+  const practiceLabel = t.isPractice ? ' (Practice)' : '';
+  document.getElementById('trial-intro-text').textContent =
+    `Trial ${t.trialId}${practiceLabel}`;
+  showScreen('trial-intro-screen');
+}
+
+function startTrial() {
+  const t = state.currentTrialDef;
+  state.arraySizeForTrial = t.arraySize;
+
+  // Build store items for the trial.
+  // Layout stability: in BLOCKED design, keep the same items+positions within
+  // a block; in MIXED, generate fresh per trial. (When array size varies in
+  // mixed mode, items are re-laid out anyway.) Store-shuffle disables stable layout.
+  const useStableBlockLayout = (cfg.design === 'blocked' && cfg.arrayMode === 'fixed' && cfg.storeShuffleN === 0);
+  if (useStableBlockLayout && state.blockStoreItems
+      && state.blockStoreItems.condition === t.condition
+      && state.blockStoreItems.size === t.arraySize) {
+    state.storeItems = state.blockStoreItems.items.map(i => ({ ...i, picked: false }));
+  } else {
+    // Per-trial sampling. The pool is partitioned by condition so the two
+    // conditions feel visually distinct (different item subsets). Within a
+    // condition's partition, we randomly sample arraySize unique items.
+    const condIdx = Math.max(0, state.blockOrder.indexOf(t.condition));
+    const nConds = Math.max(state.blockOrder.length, 1);
+    const partitionSize = Math.floor(state.stimulusPool.length / nConds);
+    const partitionStart = condIdx * partitionSize;
+    const partition = state.stimulusPool.slice(partitionStart, partitionStart + partitionSize);
+
+    // Source: the condition's partition if big enough, otherwise the full pool
+    const source = partition.length >= t.arraySize ? partition : state.stimulusPool;
+
+    // Bulletproof unique sampling: build via a Set keyed by filename.
+    // If the partition has any duplicates we draw extras from the full pool.
+    const seen = new Set();
+    const final = [];
+    const drawFrom = (items) => {
+      const shuffled = [...items];
+      shuffle(shuffled);
+      for (const it of shuffled) {
+        if (final.length >= t.arraySize) break;
+        if (!seen.has(it.filename)) {
+          seen.add(it.filename);
+          final.push(it);
+        }
+      }
+    };
+    drawFrom(source);
+    if (final.length < t.arraySize) drawFrom(state.stimulusPool);
+
+    if (final.length < t.arraySize) {
+      // Insufficient unique stimuli — log loudly and alert the experimenter
+      console.error('INSUFFICIENT UNIQUE STIMULI for trial', t.trialId,
+        '— wanted', t.arraySize, 'got', final.length);
+      console.error('Pool filenames:', state.stimulusPool.map(p => p.filename));
+      alert(`Could only build ${final.length}/${t.arraySize} unique items for this trial. Check console for details.`);
+    }
+
+    // Log the trial's selected items to console for verification (first trial mostly)
+    if (state.allTrialRecords.length === 0) {
+      console.log(`Trial ${t.trialId} store items (${final.length}):`,
+        final.map(i => i.filename).join(', '));
+    }
+
+    state.storeItems = final.map((it, idx) => ({
+      id: it.id, blob: it, position: idx, picked: false
+    }));
+    if (useStableBlockLayout) {
+      state.blockStoreItems = {
+        condition: t.condition, size: t.arraySize,
+        items: state.storeItems.map(s => ({ ...s, picked: false }))
+      };
+    }
+  }
+
+  // Pick list items (random subset of store items, of size cfg.listSize)
+  const indices = Array.from({ length: state.storeItems.length }, (_, i) => i);
+  shuffle(indices);
+  const listIndices = indices.slice(0, cfg.listSize);
+  state.listItems = listIndices.map(i => ({
+    ...state.storeItems[i],
+    foundInStore: false
+  }));
+
+  // Initialize trial data record
+  state.trialData = {
+    participantId: cfg.participantId,
+    session: cfg.session,
+    age: cfg.age,
+    trialId: t.trialId,
+    condition: t.condition,
+    schedule: t.schedule || 'reliable',
+    disappearAfter: t.disappearAfter || null,
+    blankEvery: t.blankEvery || null,
+    outageDisappear: t.outageDisappear || null,
+    outageReturn: t.outageReturn || null,
+    countdownSec: t.countdownSec || null,
+    isPractice: t.isPractice,
+    arraySize: t.arraySize,
+    listSize: cfg.listSize,
+    listShuffleN: cfg.listShuffleN,
+    storeShuffleN: cfg.storeShuffleN,
+    targetsPerTrial: cfg.targetsPerTrial,
+    design: cfg.design,
+    trialStart: Date.now(),
+    trialEnd: null,
+    listItemIds: state.listItems.map(i => i.id),
+    listItemFilenames: state.listItems.map(i => i.blob.filename),
+    storeItemPositions: state.storeItems.map((i, idx) => ({
+      id: i.id, filename: i.blob.filename, position: idx
+    })),
+    picks: [],
+    trips: [],
+    endReason: null,
+  };
+
+  state.starsThisTrial = 0;
+  state.correctPicksThisTrial = 0;
+  state.tripsThisTrial = 0;
+  state.picksThisVisit = 0;
+  state.listVisible = true;
+  state.currentView = 'store';
+  state.visitStartTime = Date.now();
+  state.pickRtRef = Date.now();
+  state._lastStoreShuffled = false;
+  state.storeReturnsThisTrial = 0;
+  state.countdownReadyAt = 0;
+  state.countdownDeniedAttempts = 0;
+  clearCountdownDisplay();
+
+  document.getElementById('star-count').textContent = '0';
+  document.getElementById('store-toggle-frame').innerHTML = frameIconHTML(t.condition, 28);
+  document.getElementById('trial-info-display').textContent =
+    `Trial ${t.trialId}${t.isPractice ? ' (practice)' : ''} · ${t.condition}${t.condition === 'unreliable' ? '/' + t.schedule : ''} · array=${t.arraySize}`;
+
+  renderStore();
+  showScreen('game-screen');
+  document.getElementById('store-area').style.display = 'flex';
+  document.getElementById('list-area').style.display = 'none';
+}
+
+// ============ RENDERING ============
+function renderStore() {
+  const grid = document.getElementById('store-grid');
+  const dims = gridDimensions(state.arraySizeForTrial);
+  grid.style.gridTemplateColumns = `repeat(${dims.cols}, 1fr)`;
+  grid.style.gridTemplateRows = `repeat(${dims.rows}, 1fr)`;
+  grid.innerHTML = '';
+  const totalCells = dims.rows * dims.cols;
+  for (let i = 0; i < totalCells; i++) {
+    const cell = document.createElement('div');
+    if (i < state.storeItems.length) {
+      const item = state.storeItems[i];
+      cell.className = 'item-cell shelf-bg' + (item.picked ? ' picked' : '');
+      cell.dataset.itemId = item.id;
+      cell.innerHTML = generateItemHTML(item.blob);
+      cell.addEventListener('click', (e) => onItemPick(item.id, e));
+    } else {
+      // Empty placeholder cell
+      cell.style.visibility = 'hidden';
+    }
+    grid.appendChild(cell);
+  }
+
+  // Final defensive check: inspect the actual DOM for duplicate image srcs
+  const renderedSrcs = Array.from(grid.querySelectorAll('img'))
+    .map(img => img.getAttribute('src'));
+  const srcCounts = {};
+  for (const s of renderedSrcs) srcCounts[s] = (srcCounts[s] || 0) + 1;
+  const dupes = Object.entries(srcCounts).filter(([_, n]) => n > 1);
+  if (dupes.length > 0) {
+    console.error('STORE RENDER HAS DUPLICATES:', dupes);
+    console.error('storeItems filenames:', state.storeItems.map(s => s.blob.filename));
+    alert('Duplicate image detected in store — see console (F12) for details. ' +
+          'Likely the stimulus folder has two files with identical visual content but different filenames.');
+  }
+}
+
+function renderList() {
+  const grid = document.getElementById('list-grid');
+  const frame = document.getElementById('list-frame');
+  const cond = state.currentTrialDef.condition;
+  frame.className = 'list-frame ' + (cond === 'reliable' ? 'clipboard' : 'tablet');
+  grid.innerHTML = '';
+
+  const dims = listGridDimensions(state.listItems.length);
+  grid.style.gridTemplateColumns = `repeat(${dims.cols}, 1fr)`;
+  grid.style.gridTemplateRows = `repeat(${dims.rows}, 1fr)`;
+
+  if (!state.listVisible) return;
+
+  // Determine display order
+  let order = state.listItems.map((_, i) => i);
+  let isShuffled = false;
+  // Shuffle on the Nth, 2Nth, 3Nth ... list-return visit (after the first visit).
+  // tripsThisTrial = 1 on first list visit; first "return" is tripsThisTrial = 2.
+  const listReturnIdx = state.tripsThisTrial - 1;
+  if (cfg.listShuffleN > 0 && listReturnIdx > 0 && listReturnIdx % cfg.listShuffleN === 0) {
+    shuffle(order);
+    isShuffled = true;
+  }
+  // Save the order used for this visit (logged in encoding log via tripStart)
+  state._currentListOrder = order;
+  state._currentListShuffled = isShuffled;
+
+  // Opacity jitter for unreliable
+  const jitter = (cond === 'unreliable' && cfg.opacityJitter)
+    ? 0.5 + Math.random() * 0.5 : 1.0;
+  state._currentJitter = jitter;
+
+  for (const idx of order) {
+    const item = state.listItems[idx];
+    const cell = document.createElement('div');
+    cell.className = 'list-item' + (item.foundInStore ? ' crossed' : '');
+    cell.style.opacity = jitter;
+    cell.innerHTML = generateItemHTML(item.blob);
+    grid.appendChild(cell);
+  }
+}
+
+// ============ PICK HANDLING ============
+function onItemPick(itemId, evt) {
+  if (state.currentView !== 'store') return;
+  const item = state.storeItems.find(i => i.id === itemId);
+  if (!item || item.picked) return;
+  const isTarget = state.listItems.some(li => li.id === itemId);
+  const now = Date.now();
+  const rtMs = now - state.pickRtRef;
+  state.pickRtRef = now;
+
+  item.picked = true;
+  if (isTarget) {
+    const li = state.listItems.find(l => l.id === itemId);
+    if (li) li.foundInStore = true;
+    state.starsThisTrial++;
+    state.correctPicksThisTrial++;
+    playCorrectSound();
+    showPickFeedback(evt.target, '+★', 'good');
+  } else {
+    state.starsThisTrial = Math.max(0, state.starsThisTrial - 1);
+    playIncorrectSound();
+    showPickFeedback(evt.target, '−★', 'bad');
+  }
+  state.picksThisVisit++;
+
+  // Log pick
+  const pickRecord = {
+    itemId, filename: item.blob.filename, isTarget, correct: isTarget,
+    rtMs, timestampInTrial: now - state.trialData.trialStart,
+    pickIndexInTrial: state.trialData.picks.length + 1,
+    pickIndexInVisit: state.picksThisVisit,
+    tripsBeforePick: state.tripsThisTrial,
+    positionInGrid: item.position,
+  };
+  state.trialData.picks.push(pickRecord);
+
+  // Append to global shopping log
+  state.shoppingLog.push({
+    participantId: cfg.participantId,
+    session: cfg.session,
+    trialId: state.trialData.trialId,
+    condition: state.trialData.condition,
+    schedule: state.trialData.schedule,
+    isPractice: state.trialData.isPractice,
+    arraySize: state.trialData.arraySize,
+    listSize: state.trialData.listSize,
+    pickIndexInTrial: pickRecord.pickIndexInTrial,
+    pickIndexInVisit: pickRecord.pickIndexInVisit,
+    tripsBeforePick: pickRecord.tripsBeforePick,
+    itemId, filename: item.blob.filename,
+    positionInGrid: item.position,
+    isTarget, correct: isTarget,
+    rtMs, timestampInTrial: pickRecord.timestampInTrial,
+    timestampAbsoluteMs: now - state.sessionStart,
+  });
+
+  document.getElementById('star-count').textContent = state.starsThisTrial;
+  const cell = document.querySelector(`.item-cell[data-item-id="${itemId}"]`);
+  if (cell) cell.classList.add('picked');
+
+  if (state.correctPicksThisTrial >= cfg.targetsPerTrial) {
+    endTrial('completed');
+  }
+}
+
+function showPickFeedback(cellEl, txt, cls) {
+  const rect = cellEl.getBoundingClientRect();
+  const fb = document.createElement('div');
+  fb.className = 'pick-fb ' + cls;
+  fb.textContent = txt;
+  fb.style.left = (rect.left + rect.width / 2) + 'px';
+  fb.style.top = (rect.top + rect.height / 2 - 20) + 'px';
+  document.body.appendChild(fb);
+  setTimeout(() => fb.remove(), 900);
+}
+
+// ============ VIEW TOGGLING ============
+function goToList() {
+  if (state.currentView !== 'store') return;
+  const t = state.currentTrialDef;
+
+  // Countdown schedule: check if we're still in the cooldown window
+  if (t.condition === 'unreliable' && t.schedule === 'countdown') {
+    const now = Date.now();
+    const ready = state.countdownReadyAt || 0;
+    if (now < ready) {
+      // Deny access, log a denied-access event, stay in store
+      const remaining = Math.ceil((ready - now) / 1000);
+      state.countdownDeniedAttempts = (state.countdownDeniedAttempts || 0) + 1;
+      logDeniedAccess(remaining);
+      flashListButtonDenied(remaining);
+      return;
+    }
+  }
+
+  state.currentView = 'list';
+  state.tripsThisTrial++;
+
+  // Determine visibility using the schedule helper
+  if (t.condition === 'unreliable' && t.schedule !== 'countdown') {
+    const vis = computeListVisibility(t, state.tripsThisTrial);
+    state.listVisible = vis.visible;
+  } else {
+    state.listVisible = true;
+  }
+
+  state.tripStartTime = Date.now();
+  state.tripStartWallclock = Date.now();
+  state.tripActiveStart = Date.now();
+  state.tripActiveMs = 0;  // accumulates while user is actively viewing list
+
+  document.getElementById('store-area').style.display = 'none';
+  document.getElementById('list-area').style.display = 'flex';
+  renderList();
+
+  // Log trip start
+  const tripStartRecord = {
+    tripIndex: state.tripsThisTrial,
+    startMsInTrial: state.tripStartTime - state.trialData.trialStart,
+    listVisible: state.listVisible,
+    listShuffled: state._currentListShuffled || false,
+    opacityJitter: state._currentJitter || 1.0,
+    picksInPriorVisit: state.picksThisVisit,
+    scheduleUsed: t.schedule || 'reliable',
+  };
+  state.trialData._currentTripStart = tripStartRecord;
+}
+
+function logDeniedAccess(secondsRemaining) {
+  state.encodingLog.push({
+    participantId: cfg.participantId,
+    session: cfg.session,
+    trialId: state.trialData.trialId,
+    condition: state.trialData.condition,
+    trialType: 'denied_access',
+    isPractice: state.trialData.isPractice,
+    arraySize: state.trialData.arraySize,
+    listSize: state.trialData.listSize,
+    listShuffleN: cfg.listShuffleN,
+    storeShuffleN: cfg.storeShuffleN,
+    scheduleUsed: state.currentTrialDef.schedule,
+    tripIndex: -1,  // sentinel — not a real visit
+    startMsInTrial: Date.now() - state.trialData.trialStart,
+    endMsInTrial: Date.now() - state.trialData.trialStart,
+    dwellMs: 0,
+    wallClockMs: 0,
+    activeTimeMs: 0,
+    listVisible: false,
+    listWasShuffledThisVisit: false,
+    storeWasShuffledOnPriorReturn: state._lastStoreShuffled || false,
+    opacityJitter: 1.0,
+    picksInPriorVisit: state.picksThisVisit,
+    countdownRemainingSec: secondsRemaining,
+    eventType: 'denied_access',
+    timestampAbsoluteMs: Date.now() - state.sessionStart,
+  });
+}
+
+function flashListButtonDenied(remaining) {
+  // Brief visual feedback on the list button showing the remaining seconds
+  const btn = document.querySelector('#store-area .toggle-btn');
+  if (!btn) return;
+  const originalHTML = btn.innerHTML;
+  btn.style.background = '#c4423a';
+  btn.style.color = 'white';
+  btn.innerHTML = `⏱ Wait ${remaining}s`;
+  setTimeout(() => {
+    btn.style.background = '';
+    btn.style.color = '';
+    btn.innerHTML = originalHTML;
+  }, 900);
+}
+
+function goToStore() {
+  if (state.currentView !== 'list') return;
+  const now = Date.now();
+  const dwellMs = now - state.tripStartTime;
+  const wallClockMs = now - state.tripStartWallclock;
+  const activeTimeMs = state.tripActiveMs + (now - state.tripActiveStart);
+  const tripRec = state.trialData._currentTripStart;
+  const fullTripRec = {
+    ...tripRec,
+    endMsInTrial: now - state.trialData.trialStart,
+    dwellMs, wallClockMs, activeTimeMs,
+  };
+  state.trialData.trips.push(fullTripRec);
+
+  // Set the countdown timer (applies only on next list-open attempt)
+  const t = state.currentTrialDef;
+  if (t.condition === 'unreliable' && t.schedule === 'countdown') {
+    state.countdownReadyAt = now + (t.countdownSec * 1000);
+    startCountdownDisplay(t.countdownSec);
+  }
+
+  // Append to global encoding log
+  state.encodingLog.push({
+    participantId: cfg.participantId,
+    session: cfg.session,
+    trialId: state.trialData.trialId,
+    condition: state.trialData.condition,
+    trialType: 'list_visit',
+    isPractice: state.trialData.isPractice,
+    arraySize: state.trialData.arraySize,
+    listSize: state.trialData.listSize,
+    listShuffleN: cfg.listShuffleN,
+    storeShuffleN: cfg.storeShuffleN,
+    scheduleUsed: tripRec.scheduleUsed,
+    tripIndex: tripRec.tripIndex,
+    startMsInTrial: tripRec.startMsInTrial,
+    endMsInTrial: fullTripRec.endMsInTrial,
+    dwellMs,
+    wallClockMs,
+    activeTimeMs,
+    listVisible: tripRec.listVisible,
+    listWasShuffledThisVisit: tripRec.listShuffled,
+    storeWasShuffledOnPriorReturn: state._lastStoreShuffled || false,
+    opacityJitter: tripRec.opacityJitter,
+    picksInPriorVisit: tripRec.picksInPriorVisit,
+    countdownRemainingSec: null,
+    eventType: 'list_visit',
+    timestampAbsoluteMs: state.tripStartTime - state.sessionStart,
+  });
+
+  state.currentView = 'store';
+  state.picksThisVisit = 0;
+  state.pickRtRef = Date.now();
+
+  // Optionally reshuffle the store items' spatial order.
+  state.storeReturnsThisTrial++;
+  let storeShuffledThisReturn = false;
+  if (cfg.storeShuffleN > 0 && state.storeReturnsThisTrial % cfg.storeShuffleN === 0) {
+    shuffle(state.storeItems);
+    state.storeItems.forEach((it, idx) => { it.position = idx; });
+    storeShuffledThisReturn = true;
+  }
+  state._lastStoreShuffled = storeShuffledThisReturn;
+
+  document.getElementById('store-area').style.display = 'flex';
+  document.getElementById('list-area').style.display = 'none';
+  renderStore();
+}
+
+// Countdown display — shows remaining seconds on the list button as it ticks down
+let countdownIntervalHandle = null;
+function startCountdownDisplay(seconds) {
+  clearCountdownDisplay();
+  const btn = document.querySelector('#store-area .toggle-btn');
+  if (!btn) return;
+  // Save original markup so we can restore it
+  if (!btn.dataset.originalHTML) btn.dataset.originalHTML = btn.innerHTML;
+  let remaining = seconds;
+  const update = () => {
+    if (remaining <= 0) { clearCountdownDisplay(); return; }
+    btn.innerHTML = `⏱ ${Math.ceil(remaining)}s`;
+    btn.style.opacity = '0.6';
+  };
+  update();
+  countdownIntervalHandle = setInterval(() => {
+    remaining -= 0.1;
+    if (remaining <= 0) clearCountdownDisplay();
+    else update();
+  }, 100);
+}
+function clearCountdownDisplay() {
+  if (countdownIntervalHandle) {
+    clearInterval(countdownIntervalHandle);
+    countdownIntervalHandle = null;
+  }
+  const btn = document.querySelector('#store-area .toggle-btn');
+  if (btn && btn.dataset.originalHTML) {
+    btn.innerHTML = btn.dataset.originalHTML;
+    delete btn.dataset.originalHTML;
+    btn.style.opacity = '';
+  }
+}
+
+// ============ TRIAL END ============
+function endTrialEarly() { endTrial('cart'); }
+
+function endTrial(reason) {
+  clearCountdownDisplay();
+  state.trialData.trialEnd = Date.now();
+  state.trialData.endReason = reason;
+  state.trialData.totalTrips = state.tripsThisTrial;
+  state.trialData.totalStars = state.starsThisTrial;
+  state.trialData.totalCorrectPicks = state.correctPicksThisTrial;
+  state.trialData.durationMs = state.trialData.trialEnd - state.trialData.trialStart;
+  state.allTrialRecords.push(state.trialData);
+
+  // Show trial-end feedback (skip for absent trials ended via cart after disappearance — but still show for clarity)
+  document.getElementById('feedback-stars-text').textContent =
+    `You earned ${state.starsThisTrial} star${state.starsThisTrial === 1 ? '' : 's'}!`;
+  const starDisplay = state.starsThisTrial >= cfg.targetsPerTrial ? '★★★'
+    : state.starsThisTrial >= Math.ceil(cfg.targetsPerTrial/2) ? '★★'
+    : state.starsThisTrial >= 1 ? '★' : '–';
+  document.querySelector('#feedback-overlay .big-stars').textContent = starDisplay;
+  playStarSound();
+  document.getElementById('feedback-overlay').classList.add('active');
+}
+
+function nextTrial() {
+  document.getElementById('feedback-overlay').classList.remove('active');
+  state.currentTrialIdx++;
+  goToNextItem();
+}
+
+// ============ TERMINATE ============
+function confirmTerminate() {
+  document.getElementById('terminate-overlay').classList.add('active');
+}
+function cancelTerminate() {
+  document.getElementById('terminate-overlay').classList.remove('active');
+}
+function doTerminate() {
+  document.getElementById('terminate-overlay').classList.remove('active');
+  // If a trial is mid-flight, save what's there
+  if (state.trialData && !state.trialData.trialEnd) {
+    state.trialData.trialEnd = Date.now();
+    state.trialData.endReason = 'terminated';
+    state.trialData.totalTrips = state.tripsThisTrial;
+    state.trialData.totalStars = state.starsThisTrial;
+    state.trialData.totalCorrectPicks = state.correctPicksThisTrial || 0;
+    state.trialData.durationMs = state.trialData.trialEnd - state.trialData.trialStart;
+    state.allTrialRecords.push(state.trialData);
+    state.trialData = null;
+  }
+  // Auto-download all CSVs with a suffix indicating termination
+  downloadAllCSVs('TERMINATED');
+  returnToConfig();
+}
+
+function returnToConfig() {
+  // Reset state and refresh PID for next session
+  document.getElementById('cfg-pid').value = 'P' + Date.now().toString(36).toUpperCase();
+  showScreen('config-screen');
+}
+
+// ============ METACOGNITION ============
+function goToMeta() {
+  state.metaStep = 0;
+  showMetaQuestion();
+}
+
+function showMetaQuestion() {
+  const questions = [
+    { key: 'easier', text: 'Which game did you think was EASIER?' },
+    { key: 'preferred', text: 'Which game would you play AGAIN to earn more stars?' }
+  ];
+  const q = questions[state.metaStep];
+  document.getElementById('meta-question-text').textContent = q.text;
+  const choices = document.getElementById('meta-choices');
+  choices.innerHTML = '';
+  const opts = Math.random() < 0.5 ? ['reliable', 'unreliable'] : ['unreliable', 'reliable'];
+  opts.forEach(cond => {
+    const div = document.createElement('div');
+    div.className = 'meta-choice';
+    div.dataset.cond = cond;
+    div.innerHTML = `<div>${frameIconHTML(cond, 90)}</div>
+                     <div class="label">${cond === 'reliable' ? 'Clipboard Game' : 'Tablet Game'}</div>`;
+    div.addEventListener('click', () => selectMetaChoice(div, cond));
+    choices.appendChild(div);
+  });
+  const submitBtn = document.getElementById('meta-submit');
+  submitBtn.disabled = true;
+  submitBtn.style.opacity = '0.4';
+  showScreen('meta-screen');
+}
+
+function selectMetaChoice(el, cond) {
+  document.querySelectorAll('.meta-choice').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  state._currentMetaSelection = cond;
+  const submitBtn = document.getElementById('meta-submit');
+  submitBtn.disabled = false;
+  submitBtn.style.opacity = '1';
+}
+
+function submitMeta() {
+  const questions = ['easier', 'preferred'];
+  state.metaResponses[questions[state.metaStep]] = state._currentMetaSelection;
+  state._currentMetaSelection = null;
+  state.metaStep++;
+  if (state.metaStep >= questions.length) {
+    finishSession();
+  } else {
+    showMetaQuestion();
+  }
+}
+
+// ============ FINISH ============
+function finishSession() {
+  document.getElementById('done-pid-display').textContent =
+    `Participant: ${cfg.participantId} · Session ${cfg.session}`;
+  document.getElementById('done-status').textContent =
+    `${state.allTrialRecords.length} trials completed · downloading CSVs…`;
+  showScreen('done-screen');
+  // Auto-download CSVs
+  setTimeout(() => downloadAllCSVs('COMPLETE'), 300);
+}
+
+// ============ CSV EXPORT ============
+function csvEscape(v) {
+  if (v === null || v === undefined) return '';
+  const s = String(v);
+  if (s.includes(',') || s.includes('"') || s.includes('\n')) {
+    return '"' + s.replace(/"/g, '""') + '"';
+  }
+  return s;
+}
+
+function rowsToCSV(rows) {
+  if (rows.length === 0) return '';
+  // Union of all keys (in stable order from first row + any extras)
+  const keys = [];
+  const seen = new Set();
+  for (const r of rows) {
+    for (const k of Object.keys(r)) {
+      if (!seen.has(k)) { seen.add(k); keys.push(k); }
+    }
+  }
+  const lines = [keys.join(',')];
+  for (const r of rows) {
+    lines.push(keys.map(k => csvEscape(r[k])).join(','));
+  }
+  return lines.join('\n');
+}
+
+function downloadFile(filename, content, mime = 'text/csv') {
+  const blob = new Blob([content], { type: mime + ';charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function buildSummaryRows() {
+  const rows = [];
+  for (const t of state.allTrialRecords) {
+    const trips = t.trips || [];
+    const dwells = trips.map(tr => tr.dwellMs);
+    const meanDwell = dwells.length ? dwells.reduce((a,b)=>a+b,0)/dwells.length : 0;
+    const totalDwell = dwells.reduce((a,b)=>a+b,0);
+    const picks = t.picks || [];
+    const nCorrect = picks.filter(p => p.correct).length;
+    const nIncorrect = picks.filter(p => !p.correct).length;
+    const accuracy = picks.length ? nCorrect / picks.length : 0;
+    const meanRt = picks.length ? picks.reduce((a,p)=>a+p.rtMs,0)/picks.length : 0;
+    const itemsEncodedPerVisit = trips.length
+      ? picks.length / Math.max(trips.length, 1) : picks.length;
+    // Streak-correct per visit
+    const streaks = computeStreaksFromTrial(t);
+    const meanStreak = streaks.length ? streaks.reduce((a,b)=>a+b,0)/streaks.length : 0;
+
+    // Wall-clock vs active time totals
+    const totalWallClock = trips.reduce((a, tr) => a + (tr.wallClockMs || tr.dwellMs || 0), 0);
+    const totalActive = trips.reduce((a, tr) => a + (tr.activeTimeMs || tr.dwellMs || 0), 0);
+    // Count denied-access attempts for this trial (from encoding log)
+    const deniedAttempts = state.encodingLog.filter(
+      r => r.trialId === t.trialId && r.eventType === 'denied_access').length;
+
+    rows.push({
+      participantId: t.participantId,
+      session: t.session,
+      age: t.age,
+      trialId: t.trialId,
+      condition: t.condition,
+      schedule: t.schedule,
+      disappearAfter: t.disappearAfter,
+      blankEvery: t.blankEvery,
+      outageDisappear: t.outageDisappear,
+      outageReturn: t.outageReturn,
+      countdownSec: t.countdownSec,
+      isPractice: t.isPractice,
+      design: t.design,
+      arraySize: t.arraySize,
+      listSize: t.listSize,
+      targetsPerTrial: t.targetsPerTrial,
+      listShuffleN: t.listShuffleN,
+      storeShuffleN: t.storeShuffleN,
+      nTrips: trips.length,
+      nDeniedAttempts: deniedAttempts,
+      totalDwellMs: totalDwell,
+      totalWallClockMs: totalWallClock,
+      totalActiveMs: totalActive,
+      meanDwellMs: Math.round(meanDwell),
+      nPicks: picks.length,
+      nCorrect, nIncorrect,
+      totalCorrectPicks: t.totalCorrectPicks,
+      totalStars: t.totalStars,
+      accuracy: accuracy.toFixed(3),
+      meanRtMs: Math.round(meanRt),
+      meanStreakCorrect: meanStreak.toFixed(2),
+      meanItemsPickedPerVisit: itemsEncodedPerVisit.toFixed(2),
+      durationMs: t.durationMs,
+      endReason: t.endReason,
+      trialStartUTC: new Date(t.trialStart).toISOString(),
+      trialEndUTC: new Date(t.trialEnd).toISOString(),
+      easierResponse: state.metaResponses.easier || '',
+      preferredResponse: state.metaResponses.preferred || '',
+    });
+  }
+  return rows;
+}
+
+function computeStreaksFromTrial(t) {
+  // For each visit (between trips), compute the run of correct picks from start
+  const streaks = [];
+  const trips = t.trips || [];
+  const picks = t.picks || [];
+  // Determine pick boundaries between trips by tripsBeforePick changes
+  let visitPicks = [];
+  let lastTripsBefore = -1;
+  for (const p of picks) {
+    if (p.tripsBeforePick !== lastTripsBefore && visitPicks.length > 0) {
+      streaks.push(streakOf(visitPicks));
+      visitPicks = [];
+    }
+    lastTripsBefore = p.tripsBeforePick;
+    visitPicks.push(p);
+  }
+  if (visitPicks.length > 0) streaks.push(streakOf(visitPicks));
+  return streaks;
+}
+function streakOf(picks) {
+  let s = 0;
+  for (const p of picks) { if (p.correct) s++; else break; }
+  return s;
+}
+
+function downloadAllCSVs(suffix = '') {
+  const ts = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
+  const base = `${cfg.participantId}_S${cfg.session}_${ts}${suffix ? '_' + suffix : ''}`;
+
+  // 1) Encoding log
+  if (state.encodingLog.length > 0) {
+    downloadFile(`${base}_encoding.csv`, rowsToCSV(state.encodingLog));
+  }
+  // 2) Shopping log
+  if (state.shoppingLog.length > 0) {
+    setTimeout(() => downloadFile(`${base}_shopping.csv`, rowsToCSV(state.shoppingLog)), 250);
+  }
+  // 3) Summary
+  const summaryRows = buildSummaryRows();
+  if (summaryRows.length > 0) {
+    setTimeout(() => downloadFile(`${base}_summary.csv`, rowsToCSV(summaryRows)), 500);
+  }
+  // 4) Config (so the run is fully reproducible)
+  setTimeout(() => downloadFile(`${base}_config.json`,
+    JSON.stringify({ config: cfg, blockOrder: state.blockOrder,
+                     metaResponses: state.metaResponses,
+                     sessionStartUTC: new Date(state.sessionStart).toISOString(),
+                     trialPlanSummary: state.trialPlan.filter(t => !t.blockBoundary).length },
+                   null, 2), 'application/json'), 750);
+}
+
+// Prevent accidental gestures on tablet
+document.addEventListener('gesturestart', e => e.preventDefault());
+document.addEventListener('touchmove', e => {
+  if (e.touches.length > 1) e.preventDefault();
+}, { passive: false });
+
+</script>
+</body>
+</html>
