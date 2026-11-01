@@ -213,6 +213,27 @@
   .overlay-card h2 { font-size: 28px; margin-bottom: 12px; color: #c4633a; }
   .overlay-buttons { display: flex; gap: 16px; justify-content: center; margin-top: 16px; }
 
+  /* ===== Effort chase button ===== */
+  .effort-chase-btn {
+    position: absolute;
+    z-index: 80;
+    background: #f5c542;
+    border: none;
+    border-radius: 14px;
+    padding: 12px 26px;
+    font-size: 18px;
+    font-weight: bold;
+    font-family: inherit;
+    cursor: pointer;
+    box-shadow: 0 4px 0 #b89328;
+    animation: effortPop 0.25s ease-out;
+  }
+  .effort-chase-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #b89328; }
+  @keyframes effortPop {
+    0% { transform: scale(0); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
   /* ===== Pick feedback (floating +/-) ===== */
   .pick-fb {
     position: absolute; font-size: 44px; font-weight: bold;
@@ -247,7 +268,15 @@
   <!-- ============ CONFIG SCREEN ============ -->
   <div id="config-screen" class="screen active">
     <div class="card">
-      <h1>Shopping Game — Configuration</h1>
+      <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 8px;">
+        <div>
+          <h1 style="margin-bottom: 4px;">Shopping Game — Configuration</h1>
+        </div>
+        <div style="text-align: center; flex-shrink: 0; margin-left: 16px;">
+          <img src="data:image/png;base64,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h47V3HHrbaNHjiSUQoS2bd8ma9rmt95adv2SVctX6rG4qmm5uXmxSCQajYwoLrnY1rZ8yfLCkqJdu3fLCIUj4fqGhvmzr6usqDhdf/axJ5+8fkF1ID9w+FhNX18fY6ykpARhzAADNsfAbnlT/D8e4mazFSrH5yzedSxBoIh/huDlF8ectNRCOLLPcikZZb1dPc89/0Jre9u0KVMPHDgwYvQo0zRbWlt9Pl/92fqdO3aeOH1y7JgxX/rCP82ePjMWj2NJiht6e1v7n//08g0rVt58082heJRhRBjTdR0B+KsnHo8Z+n333kcheLfu7OhRo5YtXXbk2NEjx2q6g73haKSro0NR1YihU0rHlpVt3bHtXP05hCQGAYOMMmpn0KXnWPNd71kxtrxF2lhwrEfSdCxxOCTZyuWfLUE+J5gV41aTG/gQIUqoqqoLquZPmTS5raP9YM2R/mBQ1bQlixcrklQxtlxG0onTJz9x/0MFgfyYrgPG/LJy7GTtW9u2fuyee1etXBns7x/UihhjflU933xhx97deYFAUUnxjh07ykpLn3v+ualTp37+s5/btOVtv88/dcIkQklPsL+8rKxqznWrV62qqqoyDBNBkOPPARBQQtLd8ynHTHChvIUU2HWAyiStDX/lS18EVgliHsKiXamZjuohPySSv9YpUR+MMcAYANCnahgALOFXXn9185a3VyxdVj2v6kJLU3t7e0FeXl5uHkK4salp+owZEAAKmCTLkUjkp//76KIFC9fc99FgKIQGwkES0wcmo7NnzSovG7Nn/779e/cumr9gQVVVfzCYlxdQFfnV9etvvPGmE2dOnz57JhwO//H5Z7EkzZs1JxqNQsAi4fCRo0eBhAoC+YwQYJPfm6xNZ6iciOjpIuC2F+U9HUv0wFpE9PoMA4/4QfqyLEsYx+JxBhgEkFKqquprb7xRUFi44volRiRyx623333nRwChbR3t3d09rRdbj9UcnTV7zu2336aoajQaDeTlAUohhE/8/qmc3Ny19300FotBmAhfS5JQEBBCRo8edebd09XzqxctWmTo+r333stMEu7vv+Wmm8/W1586dfr++z5mGsZ102ZUVFburTkUCoaWVS/+1e+eOHnq1L9++asYISNJKbGE192Fx2QVxMkajsUJYBLX6bwVSOYIeDv7MSX8gzEmSdLZurqTZ99VVJUZxDRN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" alt="Shalev Lab" style="width: 100px; height: auto; opacity: 0.85;">
+          <div style="font-size: 10px; color: #888; margin-top: 2px; font-style: italic;">Lifespan Cognitive Development</div>
+        </div>
+      </div>
 
       <h2>Participant</h2>
       <div class="config-grid">
@@ -264,7 +293,7 @@
       <h2>Task parameters</h2>
       <div class="config-grid">
         <label>Items on shopping list:</label>
-        <input type="number" id="cfg-list-size" value="6" min="2" max="8">
+        <input type="number" id="cfg-list-size" value="4" min="2" max="8">
 
         <label>Search array size:</label>
         <select id="cfg-array-mode">
@@ -274,7 +303,7 @@
 
         <div class="toggle-display shown" id="cfg-fixed-row">
           <label>&nbsp;&nbsp;Array size (fixed):</label>
-          <input type="number" id="cfg-array-size" value="20" min="12" max="24">
+          <input type="number" id="cfg-array-size" value="10" min="8" max="24">
         </div>
         <div class="toggle-display" id="cfg-variable-row">
           <label>&nbsp;&nbsp;Low load:</label>
@@ -284,7 +313,7 @@
         </div>
 
         <label>Targets to find per trial:</label>
-        <input type="number" id="cfg-targets" value="6" min="1" max="8">
+        <input type="number" id="cfg-targets" value="4" min="1" max="8">
 
         <label>Shuffle <strong>list</strong> every N visits:</label>
         <input type="number" id="cfg-list-shuffle-n" value="0" min="0" max="20">
@@ -294,7 +323,14 @@
         <label>Shuffle <strong>store</strong> every N visits:</label>
         <input type="number" id="cfg-store-shuffle-n" value="0" min="0" max="20">
         <div class="config-row-full help-text">
-          0 = never shuffle store. 1 = shuffle on every return from list. 2 = every 2nd return. Etc. Tests memory for item identity vs. spatial location.
+          0 = never. 1 = every return from list. 2 = every 2nd return. Etc. Swaps out distractors and repositions all items. Targets stay but move location.
+        </div>
+        <div class="config-row-full config-checkbox-row">
+          <input type="checkbox" id="cfg-stable-items">
+          <label for="cfg-stable-items">Keep same item set across trials within a block</label>
+        </div>
+        <div class="config-row-full help-text">
+          When checked, the same images appear in every trial of a block (only positions and target selection change). When unchecked (default), each trial draws fresh random images.
         </div>
       </div>
 
@@ -323,29 +359,38 @@
         </select>
 
         <label>Reliable: # test trials:</label>
-        <input type="number" id="cfg-reliable-trials" value="3" min="1" max="20">
+        <input type="number" id="cfg-reliable-trials" value="12" min="1" max="20">
         <label>Reliable: # practice:</label>
         <input type="number" id="cfg-reliable-practice" value="1" min="0" max="5">
 
         <label>Unreliable: # test trials:</label>
-        <input type="number" id="cfg-unreliable-trials" value="6" min="1" max="30">
+        <input type="number" id="cfg-unreliable-trials" value="12" min="1" max="30">
         <label>Unreliable: # practice:</label>
-        <input type="number" id="cfg-unreliable-practice" value="2" min="0" max="5">
+        <input type="number" id="cfg-unreliable-practice" value="1" min="0" max="5">
 
         <label>Unreliable schedule:</label>
         <select id="cfg-schedule">
-          <option value="countdown">Countdown timer (default)</option>
+          <option value="effort">Effort (multi-tap sequence to open list)</option>
+          <option value="countdown">Countdown timer</option>
           <option value="permanent">Permanent (original paper: disappear & never return)</option>
           <option value="everyNth">Every-Nth: visible on 1, N+1, 2N+1...</option>
           <option value="outage">Outage: disappears after N, returns after M trips</option>
         </select>
 
         <div class="config-row-full help-text">
-          Controls how the unreliable list behaves. Countdown makes list-checking "costly" but never impossible.
+          Controls how the unreliable list behaves. Countdown and Effort make list-checking "costly" but never impossible.
+        </div>
+
+        <!-- Effort params -->
+        <div class="toggle-display shown" id="cfg-sched-effort">
+          <label>&nbsp;&nbsp;Total taps required:</label>
+          <input type="number" id="cfg-effort-taps" value="2" min="2" max="6">
+          <label>&nbsp;&nbsp;Delay between buttons (ms):</label>
+          <input type="number" id="cfg-effort-delay" value="1000" min="200" max="3000" step="100">
         </div>
 
         <!-- Countdown params -->
-        <div class="toggle-display shown" id="cfg-sched-countdown">
+        <div class="toggle-display" id="cfg-sched-countdown">
           <label>&nbsp;&nbsp;Countdown (seconds):</label>
           <input type="number" id="cfg-countdown-sec" value="3" min="1" max="60" step="0.5">
         </div>
@@ -377,7 +422,7 @@
         <label>List opacity jitter (unreliable):</label>
         <select id="cfg-opacity-jitter">
           <option value="on">On (50–100%)</option>
-          <option value="off">Off (always 100%)</option>
+          <option value="off" selected>Off (always 100%)</option>
         </select>
       </div>
 
@@ -390,7 +435,15 @@
         </div>
 
         <div class="config-row-full config-checkbox-row">
-          <input type="checkbox" id="cfg-meta-questions" checked>
+          <input type="checkbox" id="cfg-endless-practice" checked>
+          <label for="cfg-endless-practice">Endless practice (repeat until "Ready" is pressed)</label>
+        </div>
+        <div class="config-row-full help-text">
+          When checked, practice trials repeat until the experimenter taps "Ready to begin." The number of practice attempts is logged.
+        </div>
+
+        <div class="config-row-full config-checkbox-row">
+          <input type="checkbox" id="cfg-meta-questions">
           <label for="cfg-meta-questions">Show metacognition questions at end</label>
         </div>
         <div class="config-row-full config-checkbox-row">
@@ -399,7 +452,9 @@
         </div>
       </div>
 
+      <div id="cloud-config-status" style="font-size: 14px; color: #888; margin: 12px 0 0;"></div>
       <div class="config-buttons">
+        <button class="small-btn" onclick="testCloud()">Test cloud save</button>
         <button class="small-btn" onclick="loadConfigFromStorage()">Load last config</button>
         <button class="big-btn green" onclick="startFromConfig()">Start Experiment →</button>
       </div>
@@ -468,7 +523,10 @@
         <h2>Trial complete!</h2>
         <div class="big-stars">★★★</div>
         <p id="feedback-stars-text">You earned 6 stars!</p>
-        <button class="big-btn green" onclick="nextTrial()">Next</button>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+          <button class="big-btn green" onclick="nextTrial()">Next</button>
+          <button class="small-btn" id="ready-to-begin-btn" style="display:none; margin-top: 8px; background: #c4633a; box-shadow: 0 2px 0 #8a4528;" onclick="endPracticeEarly()">Ready to begin the experiment</button>
+        </div>
       </div>
     </div>
 
@@ -500,14 +558,18 @@
       <p>Thank you for playing the Shopping Game!</p>
       <p id="done-pid-display" style="font-size: 14px; color: #888; margin-top: 16px;"></p>
       <p id="done-status" style="font-size: 14px; color: #4a8a5c; margin-top: 8px;"></p>
+      <p id="cloud-status" style="font-size: 14px; color: #888; margin-top: 4px;"></p>
       <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 16px;">
         <button class="big-btn" onclick="downloadAllCSVs()">Download CSVs</button>
+        <button class="big-btn" id="cloud-retry-btn" style="display:none" onclick="retryCloud()">Retry cloud save</button>
         <button class="big-btn green" onclick="returnToConfig()">New Session</button>
       </div>
     </div>
   </div>
 
 </div>
+
+<div id="cloud-dot" style="display:none; position:fixed; right:6px; bottom:6px; width:7px; height:7px; border-radius:50%; background:#bbb; opacity:0.4; pointer-events:none; z-index:9999;"></div>
 
 <script>
 /* =========================================================================
@@ -534,6 +596,7 @@ function readConfigFromForm() {
     targetsPerTrial: parseInt(document.getElementById('cfg-targets').value),
     listShuffleN: Math.max(0, parseInt(document.getElementById('cfg-list-shuffle-n').value) || 0),
     storeShuffleN: Math.max(0, parseInt(document.getElementById('cfg-store-shuffle-n').value) || 0),
+    stableItemsAcrossTrials: document.getElementById('cfg-stable-items').checked,
 
     includeReliable: document.getElementById('cfg-include-reliable').checked,
     includeUnreliable: document.getElementById('cfg-include-unreliable').checked,
@@ -546,12 +609,15 @@ function readConfigFromForm() {
     unreliablePractice: parseInt(document.getElementById('cfg-unreliable-practice').value),
     schedule: document.getElementById('cfg-schedule').value,
     countdownSec: parseFloat(document.getElementById('cfg-countdown-sec').value) || 3,
+    effortTaps: parseInt(document.getElementById('cfg-effort-taps').value) || 3,
+    effortDelayMs: parseInt(document.getElementById('cfg-effort-delay').value) || 1000,
     permanentN: document.getElementById('cfg-permanent-n').value,
     everyNthN: parseInt(document.getElementById('cfg-everyNth-n').value) || 2,
     outageDisappear: parseInt(document.getElementById('cfg-outage-disappear').value) || 1,
     outageReturn: parseInt(document.getElementById('cfg-outage-return').value) || 2,
     opacityJitter: document.getElementById('cfg-opacity-jitter').value === 'on',
 
+    endlessPractice: document.getElementById('cfg-endless-practice').checked,
     stimDir: document.getElementById('cfg-stim-dir').value || 'stimuli/',
     showMeta: document.getElementById('cfg-meta-questions').checked,
     tryFullscreen: document.getElementById('cfg-fullscreen').checked,
@@ -583,6 +649,7 @@ function loadConfigFromStorage() {
       targetsPerTrial: v => document.getElementById('cfg-targets').value = v,
       listShuffleN: v => document.getElementById('cfg-list-shuffle-n').value = v,
       storeShuffleN: v => document.getElementById('cfg-store-shuffle-n').value = v,
+      stableItemsAcrossTrials: v => document.getElementById('cfg-stable-items').checked = v,
       // Back-compat with old boolean fields
       listShuffle: v => document.getElementById('cfg-list-shuffle-n').value = v ? 1 : 0,
       storeShuffle: v => document.getElementById('cfg-store-shuffle-n').value = v ? 1 : 0,
@@ -596,11 +663,14 @@ function loadConfigFromStorage() {
       unreliablePractice: v => document.getElementById('cfg-unreliable-practice').value = v,
       schedule: v => { document.getElementById('cfg-schedule').value = v; updateScheduleDisplay(); },
       countdownSec: v => document.getElementById('cfg-countdown-sec').value = v,
+      effortTaps: v => document.getElementById('cfg-effort-taps').value = v,
+      effortDelayMs: v => document.getElementById('cfg-effort-delay').value = v,
       permanentN: v => document.getElementById('cfg-permanent-n').value = v,
       everyNthN: v => document.getElementById('cfg-everyNth-n').value = v,
       outageDisappear: v => document.getElementById('cfg-outage-disappear').value = v,
       outageReturn: v => document.getElementById('cfg-outage-return').value = v,
       opacityJitter: v => document.getElementById('cfg-opacity-jitter').value = v ? 'on' : 'off',
+      endlessPractice: v => document.getElementById('cfg-endless-practice').checked = v,
       // Back-compat with old config fields
       unreliablePresent: v => document.getElementById('cfg-unreliable-trials').value =
         (v || 0) + parseInt(document.getElementById('cfg-unreliable-trials').value || 0),
@@ -627,6 +697,7 @@ document.getElementById('cfg-array-mode').addEventListener('change', updateArray
 function updateScheduleDisplay() {
   const sched = document.getElementById('cfg-schedule').value;
   document.getElementById('cfg-sched-countdown').classList.toggle('shown', sched === 'countdown');
+  document.getElementById('cfg-sched-effort').classList.toggle('shown', sched === 'effort');
   document.getElementById('cfg-sched-permanent').classList.toggle('shown', sched === 'permanent');
   document.getElementById('cfg-sched-everyNth').classList.toggle('shown', sched === 'everyNth');
   document.getElementById('cfg-sched-outage').classList.toggle('shown', sched === 'outage');
@@ -684,33 +755,84 @@ function tryLoadImage(src) {
 }
 
 async function discoverStimuli() {
-  const found = new Set();
-  const candidates = [];
-  for (let i = 1; i <= AUTO_DISCOVER_MAX; i++) {
-    for (const fn of AUTO_DISCOVER_PATTERNS) {
-      candidates.push(cfg.stimDir + fn(i));
+  // Strategy: first, probe index 1 with all patterns to discover which naming
+  // convention the folder uses (e.g., "1.jpg" vs "01.jpg" vs "noun01.jpg").
+  // Then load only that pattern for all remaining indices. Much faster than
+  // trying all 480 combinations at once.
+  const dir = cfg.stimDir;
+  let winningPattern = null;
+
+  // Phase 1: probe index 1 with all patterns
+  const probes = AUTO_DISCOVER_PATTERNS.map(fn => ({
+    fn, src: dir + fn(1)
+  }));
+  const probeResults = await Promise.all(probes.map(p => tryLoadImage(p.src)));
+  for (let i = 0; i < probes.length; i++) {
+    if (probeResults[i].ok) {
+      winningPattern = probes[i].fn;
+      console.log('Stimulus pattern detected:', dir + winningPattern(1));
+      break;
     }
   }
-  // Dedup candidate URLs first so we don't waste loads
-  const uniqueCandidates = Array.from(new Set(candidates));
-  const checks = await Promise.all(uniqueCandidates.map(tryLoadImage));
-  const seenIdx = new Set();
-  const seenFiles = new Set();
-  for (const c of checks) {
-    if (!c.ok) continue;
-    const filename = c.src.split('/').pop();
-    // Skip exact filename duplicates (defensive)
-    if (seenFiles.has(filename)) continue;
-    const m = c.src.match(/(\d+)\.[a-zA-Z]+$/);
-    const idx = m ? parseInt(m[1], 10) : null;
-    // Skip if we already have an image with the same numeric index
-    if (idx !== null && seenIdx.has(idx)) continue;
-    if (idx !== null) seenIdx.add(idx);
-    seenFiles.add(filename);
-    found.add(c.src);
+
+  if (!winningPattern) {
+    // No pattern matched index 1. Try all patterns for indices 1-5 as fallback.
+    console.log('No pattern matched index 1, trying broader probe...');
+    for (let i = 2; i <= 5; i++) {
+      const fallbackProbes = AUTO_DISCOVER_PATTERNS.map(fn => ({
+        fn, src: dir + fn(i)
+      }));
+      const results = await Promise.all(fallbackProbes.map(p => tryLoadImage(p.src)));
+      for (let j = 0; j < results.length; j++) {
+        if (results[j].ok) {
+          winningPattern = fallbackProbes[j].fn;
+          console.log('Stimulus pattern detected at index', i, ':', dir + winningPattern(i));
+          break;
+        }
+      }
+      if (winningPattern) break;
+    }
   }
-  state.availableStimuli = Array.from(found).sort();
-  console.log(`Discovered ${state.availableStimuli.length} unique stimuli in ${cfg.stimDir}:`,
+
+  if (!winningPattern) {
+    state.availableStimuli = [];
+    console.log('No stimuli found in', dir);
+    return state.availableStimuli;
+  }
+
+  // Phase 2: load all indices using the winning pattern, in batches of 10.
+  // Stop after 3 consecutive misses (we've passed the end of the file set).
+  const found = [];
+  const seenFiles = new Set();
+  let consecutiveMisses = 0;
+
+  for (let batchStart = 1; batchStart <= AUTO_DISCOVER_MAX; batchStart += 10) {
+    const batchEnd = Math.min(batchStart + 9, AUTO_DISCOVER_MAX);
+    const batch = [];
+    for (let i = batchStart; i <= batchEnd; i++) {
+      batch.push(dir + winningPattern(i));
+    }
+    const results = await Promise.all(batch.map(tryLoadImage));
+    let batchHits = 0;
+    for (const r of results) {
+      if (r.ok) {
+        const filename = r.src.split('/').pop();
+        if (!seenFiles.has(filename)) {
+          seenFiles.add(filename);
+          found.push(r.src);
+        }
+        batchHits++;
+        consecutiveMisses = 0;
+      } else {
+        consecutiveMisses++;
+      }
+    }
+    // If the entire batch missed (and we already found some), stop early
+    if (batchHits === 0 && found.length > 0) break;
+  }
+
+  state.availableStimuli = found.sort();
+  console.log(`Discovered ${state.availableStimuli.length} unique stimuli in ${dir}:`,
     state.availableStimuli.map(s => s.split('/').pop()));
   return state.availableStimuli;
 }
@@ -757,7 +879,7 @@ function tryFullscreen() {
 function gridDimensions(n) {
   // Canonical per-spec
   const canonical = {
-    12: { rows: 3, cols: 4 }, 15: { rows: 3, cols: 5 }, 16: { rows: 4, cols: 4 },
+    10: { rows: 2, cols: 5 }, 12: { rows: 3, cols: 4 }, 15: { rows: 3, cols: 5 }, 16: { rows: 4, cols: 4 },
     18: { rows: 3, cols: 6 }, 20: { rows: 4, cols: 5 }, 21: { rows: 3, cols: 7 },
     24: { rows: 4, cols: 6 },
   };
@@ -903,6 +1025,9 @@ function buildTrialPlan() {
         trial.outageReturn = cfg.outageReturn;
       } else if (cfg.schedule === 'countdown') {
         trial.countdownSec = cfg.countdownSec;
+      } else if (cfg.schedule === 'effort') {
+        trial.effortTaps = cfg.effortTaps;
+        trial.effortDelayMs = cfg.effortDelayMs;
       }
       trials.push(trial);
     }
@@ -969,10 +1094,19 @@ function buildTrialPlan() {
     t.listSize = cfg.listSize;
   }
 
-  // Assign sequential trial IDs
+  // Assign trial IDs and display numbers.
+  // trialId runs unbroken across the session and stays the unique key in the data files.
+  // trialNumber is shown on screen. It restarts at 1 after each block boundary
+  // and again when practice gives way to the test trials.
   let tnum = 0;
+  let dnum = 0;
+  let prevWasPractice = null;
   for (const t of trials) {
-    if (!t.blockBoundary) { t.trialId = ++tnum; }
+    if (t.blockBoundary) { dnum = 0; prevWasPractice = null; continue; }
+    t.trialId = ++tnum;
+    if (prevWasPractice !== null && prevWasPractice !== t.isPractice) dnum = 0;
+    t.trialNumber = ++dnum;
+    prevWasPractice = t.isPractice;
   }
 
   return trials;
@@ -1003,10 +1137,12 @@ async function startFromConfig() {
 
   // Reset session state
   state.sessionStart = Date.now();
+  state.sessionKey = makeSessionKey();
   state.allTrialRecords = [];
   state.encodingLog = [];
   state.shoppingLog = [];
   state.metaResponses = {};
+  state.practiceAttempts = 0;
   state.currentTrialIdx = 0;
   state.blockStoreItems = null;
 
@@ -1051,9 +1187,7 @@ async function startFromConfig() {
     return;
   }
 
-  // Build a stimulus pool large enough for the whole session
-  const conds = (cfg.includeReliable ? 1 : 0) + (cfg.includeUnreliable ? 1 : 0);
-  state.stimulusPool = buildStimulusPool(maxArr * Math.max(conds, 1));
+  // No pre-built pool needed: each trial draws fresh from state.availableStimuli.
 
   loader.remove();
   goToNextItem();
@@ -1089,7 +1223,9 @@ function showBlockIntro(boundary) {
   } else if (cond === 'unreliable') {
     title = 'Tablet Game';
     // Tailor to the schedule
-    if (cfg.schedule === 'countdown') {
+    if (cfg.schedule === 'effort') {
+      text = `Your shopping list is on a TABLET. To see the list, you need to press a few buttons first! Each time, look for the button that pops up and tap it quickly.`;
+    } else if (cfg.schedule === 'countdown') {
       text = `Your shopping list is on a TABLET. After you peek at the list, the tablet needs ${cfg.countdownSec} seconds to reload before you can check it again. Try to remember as much as you can each time you look!`;
     } else if (cfg.schedule === 'permanent') {
       text = "Your shopping list is on a TABLET. The tablet's battery might die — sometimes the list will disappear and won't come back! Try to remember the items so you can still find them.";
@@ -1124,7 +1260,7 @@ function goToTrialIntro() {
   document.getElementById('trial-intro-frame').innerHTML = frameIconHTML(t.condition, 80);
   const practiceLabel = t.isPractice ? ' (Practice)' : '';
   document.getElementById('trial-intro-text').textContent =
-    `Trial ${t.trialId}${practiceLabel}`;
+    `Trial ${t.trialNumber}${practiceLabel}`;
   showScreen('trial-intro-screen');
 }
 
@@ -1133,58 +1269,44 @@ function startTrial() {
   state.arraySizeForTrial = t.arraySize;
 
   // Build store items for the trial.
-  // Layout stability: in BLOCKED design, keep the same items+positions within
-  // a block; in MIXED, generate fresh per trial. (When array size varies in
-  // mixed mode, items are re-laid out anyway.) Store-shuffle disables stable layout.
-  const useStableBlockLayout = (cfg.design === 'blocked' && cfg.arrayMode === 'fixed' && cfg.storeShuffleN === 0);
+  // Only reuse items across trials if the user explicitly opted in via
+  // "Keep same item set across trials within a block" AND we're in a
+  // blocked design with fixed array size. Otherwise, fresh draw every trial.
+  const useStableBlockLayout = (cfg.stableItemsAcrossTrials
+    && cfg.design === 'blocked' && cfg.arrayMode === 'fixed');
   if (useStableBlockLayout && state.blockStoreItems
       && state.blockStoreItems.condition === t.condition
       && state.blockStoreItems.size === t.arraySize) {
+    // Reuse the same item set within this block (positions stay stable).
     state.storeItems = state.blockStoreItems.items.map(i => ({ ...i, picked: false }));
   } else {
-    // Per-trial sampling. The pool is partitioned by condition so the two
-    // conditions feel visually distinct (different item subsets). Within a
-    // condition's partition, we randomly sample arraySize unique items.
-    const condIdx = Math.max(0, state.blockOrder.indexOf(t.condition));
-    const nConds = Math.max(state.blockOrder.length, 1);
-    const partitionSize = Math.floor(state.stimulusPool.length / nConds);
-    const partitionStart = condIdx * partitionSize;
-    const partition = state.stimulusPool.slice(partitionStart, partitionStart + partitionSize);
+    // Draw a fresh random sample of unique items from the FULL available pool.
+    // Every trial gets a new random draw (no fixed partitioning by condition).
+    const allAvailable = state.availableStimuli.map((src, i) => ({
+      id: 'item' + i, src, filename: src.split('/').pop()
+    }));
+    const shuffled = [...allAvailable];
+    shuffle(shuffled);
 
-    // Source: the condition's partition if big enough, otherwise the full pool
-    const source = partition.length >= t.arraySize ? partition : state.stimulusPool;
-
-    // Bulletproof unique sampling: build via a Set keyed by filename.
-    // If the partition has any duplicates we draw extras from the full pool.
+    // Build unique set via filename (handles any residual near-duplicates)
     const seen = new Set();
     const final = [];
-    const drawFrom = (items) => {
-      const shuffled = [...items];
-      shuffle(shuffled);
-      for (const it of shuffled) {
-        if (final.length >= t.arraySize) break;
-        if (!seen.has(it.filename)) {
-          seen.add(it.filename);
-          final.push(it);
-        }
+    for (const it of shuffled) {
+      if (final.length >= t.arraySize) break;
+      if (!seen.has(it.filename)) {
+        seen.add(it.filename);
+        final.push(it);
       }
-    };
-    drawFrom(source);
-    if (final.length < t.arraySize) drawFrom(state.stimulusPool);
+    }
 
     if (final.length < t.arraySize) {
-      // Insufficient unique stimuli — log loudly and alert the experimenter
       console.error('INSUFFICIENT UNIQUE STIMULI for trial', t.trialId,
         '— wanted', t.arraySize, 'got', final.length);
-      console.error('Pool filenames:', state.stimulusPool.map(p => p.filename));
-      alert(`Could only build ${final.length}/${t.arraySize} unique items for this trial. Check console for details.`);
+      alert(`Could only build ${final.length}/${t.arraySize} unique items for this trial.`);
     }
 
-    // Log the trial's selected items to console for verification (first trial mostly)
-    if (state.allTrialRecords.length === 0) {
-      console.log(`Trial ${t.trialId} store items (${final.length}):`,
-        final.map(i => i.filename).join(', '));
-    }
+    console.log(`Trial ${t.trialId} store items (${final.length}):`,
+      final.map(i => i.filename).join(', '));
 
     state.storeItems = final.map((it, idx) => ({
       id: it.id, blob: it, position: idx, picked: false
@@ -1219,11 +1341,14 @@ function startTrial() {
     outageDisappear: t.outageDisappear || null,
     outageReturn: t.outageReturn || null,
     countdownSec: t.countdownSec || null,
+    effortTaps: t.effortTaps || null,
+    effortDelayMs: t.effortDelayMs || null,
     isPractice: t.isPractice,
     arraySize: t.arraySize,
     listSize: cfg.listSize,
     listShuffleN: cfg.listShuffleN,
     storeShuffleN: cfg.storeShuffleN,
+    stableItemsAcrossTrials: cfg.stableItemsAcrossTrials,
     targetsPerTrial: cfg.targetsPerTrial,
     design: cfg.design,
     trialStart: Date.now(),
@@ -1250,12 +1375,14 @@ function startTrial() {
   state.storeReturnsThisTrial = 0;
   state.countdownReadyAt = 0;
   state.countdownDeniedAttempts = 0;
+  state._effortGateCleared = false;
+  state._effortTapsDone = 0;
   clearCountdownDisplay();
 
   document.getElementById('star-count').textContent = '0';
   document.getElementById('store-toggle-frame').innerHTML = frameIconHTML(t.condition, 28);
   document.getElementById('trial-info-display').textContent =
-    `Trial ${t.trialId}${t.isPractice ? ' (practice)' : ''} · ${t.condition}${t.condition === 'unreliable' ? '/' + t.schedule : ''} · array=${t.arraySize}`;
+    `Trial ${t.trialNumber}${t.isPractice ? ' (practice)' : ''} · ${t.condition}${t.condition === 'unreliable' ? '/' + t.schedule : ''} · array=${t.arraySize}`;
 
   renderStore();
   showScreen('game-screen');
@@ -1327,40 +1454,90 @@ function renderList() {
   state._currentListOrder = order;
   state._currentListShuffled = isShuffled;
 
-  // Opacity jitter for unreliable
-  const jitter = (cond === 'unreliable' && cfg.opacityJitter)
-    ? 0.5 + Math.random() * 0.5 : 1.0;
-  state._currentJitter = jitter;
+  // Degradation for unreliable condition:
+  // Each item gets its own random opacity (0.15 - 1.0) and optional noise overlay.
+  // Fresh roll every time the list is opened, so each visit feels unpredictable.
+  const applyDegradation = (cond === 'unreliable' && cfg.opacityJitter);
+  const perItemJitters = [];
 
   for (const idx of order) {
     const item = state.listItems[idx];
     const cell = document.createElement('div');
     cell.className = 'list-item' + (item.foundInStore ? ' crossed' : '');
-    cell.style.opacity = jitter;
-    cell.innerHTML = generateItemHTML(item.blob);
+
+    if (applyDegradation && !item.foundInStore) {
+      // Per-item random opacity: some items barely visible, some clear
+      const itemOpacity = 0.15 + Math.random() * 0.85;
+      cell.style.opacity = itemOpacity.toFixed(2);
+      perItemJitters.push({ itemIdx: idx, opacity: +itemOpacity.toFixed(2) });
+
+      // Add a noise/static overlay on top of the image to simulate screen glitch
+      const noiseDiv = document.createElement('div');
+      noiseDiv.style.cssText = `
+        position: absolute; inset: 0; pointer-events: none; z-index: 1;
+        background: repeating-conic-gradient(
+          rgba(0,0,0,${(0.05 + Math.random() * 0.15).toFixed(2)}) 0%,
+          transparent ${(1 + Math.random() * 3).toFixed(1)}%
+        );
+        mix-blend-mode: multiply;
+        opacity: ${(0.3 + Math.random() * 0.7).toFixed(2)};
+      `;
+      // Random scanlines effect (some items get them, some don't)
+      if (Math.random() < 0.4) {
+        noiseDiv.style.background += `, repeating-linear-gradient(
+          to bottom, transparent, transparent 2px,
+          rgba(0,0,0,0.08) 2px, rgba(0,0,0,0.08) 4px
+        )`;
+      }
+      // Insert image first, then noise on top
+      cell.insertAdjacentHTML('afterbegin', generateItemHTML(item.blob));
+      cell.appendChild(noiseDiv);
+    } else {
+      perItemJitters.push({ itemIdx: idx, opacity: 1.0 });
+      cell.innerHTML = generateItemHTML(item.blob);
+    }
+
     grid.appendChild(cell);
   }
+
+  // Store the per-item jitter values for logging
+  state._currentJitter = applyDegradation
+    ? perItemJitters.map(j => j.opacity).reduce((a, b) => a + b, 0) / perItemJitters.length
+    : 1.0;
+  state._currentPerItemJitters = perItemJitters;
 }
 
 // ============ PICK HANDLING ============
 function onItemPick(itemId, evt) {
   if (state.currentView !== 'store') return;
   const item = state.storeItems.find(i => i.id === itemId);
-  if (!item || item.picked) return;
+  if (!item) return;
+  // Allow clicks on already-picked INCORRECT items (to log repeated errors).
+  // Block clicks only on correctly-picked items (already faded and removed).
+  if (item.picked) return;
+
   const isTarget = state.listItems.some(li => li.id === itemId);
   const now = Date.now();
   const rtMs = now - state.pickRtRef;
   state.pickRtRef = now;
 
-  item.picked = true;
+  // Count how many times this specific item has been clicked before (for repeated-error tracking)
+  const priorClicksOnItem = state.trialData.picks.filter(p => p.itemId === itemId).length;
+
   if (isTarget) {
+    // Correct pick: mark as picked so it fades and becomes unclickable
+    item.picked = true;
     const li = state.listItems.find(l => l.id === itemId);
     if (li) li.foundInStore = true;
     state.starsThisTrial++;
     state.correctPicksThisTrial++;
     playCorrectSound();
     showPickFeedback(evt.target, '+★', 'good');
+    // Fade the cell
+    const cell = document.querySelector(`.item-cell[data-item-id="${itemId}"]`);
+    if (cell) cell.classList.add('picked');
   } else {
+    // Incorrect pick: do NOT mark as picked. Item stays visible and clickable.
     state.starsThisTrial = Math.max(0, state.starsThisTrial - 1);
     playIncorrectSound();
     showPickFeedback(evt.target, '−★', 'bad');
@@ -1370,6 +1547,8 @@ function onItemPick(itemId, evt) {
   // Log pick
   const pickRecord = {
     itemId, filename: item.blob.filename, isTarget, correct: isTarget,
+    repeated: priorClicksOnItem > 0,
+    clickNumberOnItem: priorClicksOnItem + 1,
     rtMs, timestampInTrial: now - state.trialData.trialStart,
     pickIndexInTrial: state.trialData.picks.length + 1,
     pickIndexInVisit: state.picksThisVisit,
@@ -1394,13 +1573,13 @@ function onItemPick(itemId, evt) {
     itemId, filename: item.blob.filename,
     positionInGrid: item.position,
     isTarget, correct: isTarget,
+    repeated: pickRecord.repeated,
+    clickNumberOnItem: pickRecord.clickNumberOnItem,
     rtMs, timestampInTrial: pickRecord.timestampInTrial,
     timestampAbsoluteMs: now - state.sessionStart,
   });
 
   document.getElementById('star-count').textContent = state.starsThisTrial;
-  const cell = document.querySelector(`.item-cell[data-item-id="${itemId}"]`);
-  if (cell) cell.classList.add('picked');
 
   if (state.correctPicksThisTrial >= cfg.targetsPerTrial) {
     endTrial('completed');
@@ -1428,7 +1607,6 @@ function goToList() {
     const now = Date.now();
     const ready = state.countdownReadyAt || 0;
     if (now < ready) {
-      // Deny access, log a denied-access event, stay in store
       const remaining = Math.ceil((ready - now) / 1000);
       state.countdownDeniedAttempts = (state.countdownDeniedAttempts || 0) + 1;
       logDeniedAccess(remaining);
@@ -1436,6 +1614,26 @@ function goToList() {
       return;
     }
   }
+
+  // Effort schedule: requires a multi-tap chase sequence before the list opens.
+  // First tap (the normal button) counts as tap 1. Then we spawn chase buttons
+  // that appear after a delay in random corners. Once all taps are done, goToList
+  // is called again with the effort gate cleared.
+  if (t.condition === 'unreliable' && t.schedule === 'effort' && !state._effortGateCleared) {
+    state._effortStartTime = Date.now();
+    state._effortTapsDone = 1;   // the initial tap counts
+    state._effortTapsNeeded = t.effortTaps || 3;
+    state._effortDelayMs = t.effortDelayMs || 1000;
+    state._effortTapLog = [{ tapIndex: 1, position: 'center', timestampMs: Date.now() - state.trialData.trialStart }];
+    // Hide the normal list button during the chase
+    const listBtn = document.querySelector('#store-area .toggle-btn');
+    if (listBtn) listBtn.style.visibility = 'hidden';
+    // Spawn the next chase button after a delay
+    spawnEffortChaseButton();
+    return;
+  }
+  // Clear the gate for the next visit
+  state._effortGateCleared = false;
 
   state.currentView = 'list';
   state.tripsThisTrial++;
@@ -1464,6 +1662,7 @@ function goToList() {
     listVisible: state.listVisible,
     listShuffled: state._currentListShuffled || false,
     opacityJitter: state._currentJitter || 1.0,
+    perItemJitters: state._currentPerItemJitters || [],
     picksInPriorVisit: state.picksThisVisit,
     scheduleUsed: t.schedule || 'reliable',
   };
@@ -1497,6 +1696,80 @@ function logDeniedAccess(secondsRemaining) {
     countdownRemainingSec: secondsRemaining,
     eventType: 'denied_access',
     timestampAbsoluteMs: Date.now() - state.sessionStart,
+  });
+}
+
+// ---- Effort chase-tap sequence ----
+function spawnEffortChaseButton() {
+  const tapIdx = state._effortTapsDone + 1;
+  const delay = state._effortDelayMs;
+  setTimeout(() => {
+    // Pick random bottom corner (left or right)
+    const side = Math.random() < 0.5 ? 'left' : 'right';
+    const btn = document.createElement('button');
+    btn.className = 'effort-chase-btn';
+    btn.textContent = 'See my list';
+    btn.style.bottom = '16px';
+    btn.style[side] = '16px';
+    btn.style[side === 'left' ? 'right' : 'left'] = 'auto';
+    const gameScreen = document.getElementById('game-screen');
+    gameScreen.appendChild(btn);
+
+    btn.addEventListener('click', () => {
+      btn.remove();
+      state._effortTapsDone++;
+      state._effortTapLog.push({
+        tapIndex: state._effortTapsDone,
+        position: side,
+        timestampMs: Date.now() - state.trialData.trialStart
+      });
+      if (state._effortTapsDone >= state._effortTapsNeeded) {
+        // All taps done — open the list
+        const listBtn = document.querySelector('#store-area .toggle-btn');
+        if (listBtn) listBtn.style.visibility = '';
+        // Log the full effort sequence
+        logEffortSequence();
+        // Clear the gate and proceed to list
+        state._effortGateCleared = true;
+        goToList();
+      } else {
+        // Spawn next chase button
+        spawnEffortChaseButton();
+      }
+    }, { once: true });
+  }, delay);
+}
+
+function logEffortSequence() {
+  state.encodingLog.push({
+    participantId: cfg.participantId,
+    session: cfg.session,
+    trialId: state.trialData.trialId,
+    condition: state.trialData.condition,
+    trialType: 'effort_sequence',
+    isPractice: state.trialData.isPractice,
+    arraySize: state.trialData.arraySize,
+    listSize: state.trialData.listSize,
+    listShuffleN: cfg.listShuffleN,
+    storeShuffleN: cfg.storeShuffleN,
+    scheduleUsed: 'effort',
+    tripIndex: state.tripsThisTrial + 1,
+    startMsInTrial: state._effortStartTime - state.trialData.trialStart,
+    endMsInTrial: Date.now() - state.trialData.trialStart,
+    dwellMs: 0,
+    wallClockMs: Date.now() - state._effortStartTime,
+    activeTimeMs: 0,
+    listVisible: false,
+    listWasShuffledThisVisit: false,
+    storeWasShuffledOnPriorReturn: false,
+    opacityJitterMean: 1.0,
+    opacityJitterPerItem: '[]',
+    picksInPriorVisit: state.picksThisVisit,
+    countdownRemainingSec: null,
+    effortTapsCompleted: state._effortTapsDone,
+    effortTapLog: JSON.stringify(state._effortTapLog),
+    eventType: 'effort_sequence',
+    timestampAbsoluteMs: state._effortStartTime - state.sessionStart,
   });
 }
 
@@ -1558,7 +1831,8 @@ function goToStore() {
     listVisible: tripRec.listVisible,
     listWasShuffledThisVisit: tripRec.listShuffled,
     storeWasShuffledOnPriorReturn: state._lastStoreShuffled || false,
-    opacityJitter: tripRec.opacityJitter,
+    opacityJitterMean: tripRec.opacityJitter,
+    opacityJitterPerItem: JSON.stringify(tripRec.perItemJitters || []),
     picksInPriorVisit: tripRec.picksInPriorVisit,
     countdownRemainingSec: null,
     eventType: 'list_visit',
@@ -1569,10 +1843,40 @@ function goToStore() {
   state.picksThisVisit = 0;
   state.pickRtRef = Date.now();
 
-  // Optionally reshuffle the store items' spatial order.
+  // Optionally reshuffle the store: swap out distractors + reposition everything.
+  // Targets (list items) stay in the store but move to new positions.
+  // Distractors are replaced with fresh random images from the available pool.
   state.storeReturnsThisTrial++;
   let storeShuffledThisReturn = false;
   if (cfg.storeShuffleN > 0 && state.storeReturnsThisTrial % cfg.storeShuffleN === 0) {
+    // Identify which items are targets (still needed) vs distractors
+    const targetFilenames = new Set(state.listItems.map(li => li.blob.filename));
+    const currentFilenames = new Set(state.storeItems.map(si => si.blob.filename));
+
+    // Draw fresh distractors from the pool, excluding current targets and already-used images
+    const nDistractors = state.storeItems.filter(si =>
+      !targetFilenames.has(si.blob.filename) && !si.picked).length;
+    const freshPool = state.availableStimuli
+      .map((src, i) => ({ id: 'fresh' + i, src, filename: src.split('/').pop() }))
+      .filter(it => !targetFilenames.has(it.filename) && !currentFilenames.has(it.filename));
+    shuffle(freshPool);
+    let freshIdx = 0;
+
+    // Replace unpicked distractors with new images
+    for (let i = 0; i < state.storeItems.length; i++) {
+      const si = state.storeItems[i];
+      if (si.picked) continue;  // already selected, leave as-is (faded)
+      if (targetFilenames.has(si.blob.filename)) continue;  // it's a target, keep it
+      // It's an unpicked distractor: swap it
+      if (freshIdx < freshPool.length) {
+        si.id = freshPool[freshIdx].id;
+        si.blob = freshPool[freshIdx];
+        freshIdx++;
+      }
+      // If we run out of fresh images, the old distractor stays (rare edge case)
+    }
+
+    // Reposition everything
     shuffle(state.storeItems);
     state.storeItems.forEach((it, idx) => { it.position = idx; });
     storeShuffledThisReturn = true;
@@ -1630,21 +1934,63 @@ function endTrial(reason) {
   state.trialData.totalCorrectPicks = state.correctPicksThisTrial;
   state.trialData.durationMs = state.trialData.trialEnd - state.trialData.trialStart;
   state.allTrialRecords.push(state.trialData);
+  cloudSave('IN_PROGRESS');   // background snapshot, never blocks the game
 
-  // Show trial-end feedback (skip for absent trials ended via cart after disappearance — but still show for clarity)
+  // Track practice attempts
+  if (state.trialData.isPractice) {
+    state.practiceAttempts = (state.practiceAttempts || 0) + 1;
+  }
+
+  // Always-positive trial-end feedback
+  const compliments = [
+    'Great job!', 'Amazing!', 'You did it!', 'Wonderful!',
+    'Fantastic!', 'Super!', 'Well done!', 'You rock!',
+    'Brilliant!', 'Way to go!', 'Awesome!', 'Nice work!'
+  ];
+  const compliment = compliments[Math.floor(Math.random() * compliments.length)];
+  document.querySelector('#feedback-overlay h2').textContent = compliment;
+  document.querySelector('#feedback-overlay .big-stars').textContent = '🎉';
   document.getElementById('feedback-stars-text').textContent =
-    `You earned ${state.starsThisTrial} star${state.starsThisTrial === 1 ? '' : 's'}!`;
-  const starDisplay = state.starsThisTrial >= cfg.targetsPerTrial ? '★★★'
-    : state.starsThisTrial >= Math.ceil(cfg.targetsPerTrial/2) ? '★★'
-    : state.starsThisTrial >= 1 ? '★' : '–';
-  document.querySelector('#feedback-overlay .big-stars').textContent = starDisplay;
+    "You found all the items! Let's keep going!";
+
+  // Show "Ready to begin" button during practice if endless practice is on
+  const readyBtn = document.getElementById('ready-to-begin-btn');
+  const isInPractice = state.trialData.isPractice;
+  readyBtn.style.display = (cfg.endlessPractice && isInPractice) ? 'inline-block' : 'none';
+
   playStarSound();
   document.getElementById('feedback-overlay').classList.add('active');
 }
 
 function nextTrial() {
   document.getElementById('feedback-overlay').classList.remove('active');
+
+  // Endless practice: if the current trial was practice and endless mode is on,
+  // loop back (don't advance the trial index) so the same practice trial type repeats.
+  // The trial gets fresh items because startTrial draws from the pool each time.
+  const justFinished = state.trialPlan[state.currentTrialIdx];
+  if (cfg.endlessPractice && justFinished && justFinished.isPractice) {
+    // Don't advance — replay the same slot (which will draw fresh items)
+    goToNextItem();
+    return;
+  }
+
   state.currentTrialIdx++;
+  goToNextItem();
+}
+
+function endPracticeEarly() {
+  // Experimenter pressed "Ready to begin" — skip remaining practice trials, advance to test.
+  document.getElementById('feedback-overlay').classList.remove('active');
+  // Log how many practice attempts were completed
+  console.log('Practice ended by experimenter after', state.practiceAttempts, 'attempts');
+  // Skip forward past all remaining practice trials in the plan
+  state.currentTrialIdx++;
+  while (state.currentTrialIdx < state.trialPlan.length) {
+    const next = state.trialPlan[state.currentTrialIdx];
+    if (next.blockBoundary || !next.isPractice) break;
+    state.currentTrialIdx++;
+  }
   goToNextItem();
 }
 
@@ -1669,6 +2015,7 @@ function doTerminate() {
     state.trialData = null;
   }
   // Auto-download all CSVs with a suffix indicating termination
+  cloudSave('TERMINATED');
   downloadAllCSVs('TERMINATED');
   returnToConfig();
 }
@@ -1677,6 +2024,7 @@ function returnToConfig() {
   // Reset state and refresh PID for next session
   document.getElementById('cfg-pid').value = 'P' + Date.now().toString(36).toUpperCase();
   showScreen('config-screen');
+  if (cloudEnabled() && Object.keys(cloudQueue).length) cloudPump();
 }
 
 // ============ METACOGNITION ============
@@ -1739,6 +2087,7 @@ function finishSession() {
     `${state.allTrialRecords.length} trials completed · downloading CSVs…`;
   showScreen('done-screen');
   // Auto-download CSVs
+  cloudSave('COMPLETE');
   setTimeout(() => downloadAllCSVs('COMPLETE'), 300);
 }
 
@@ -1874,31 +2223,198 @@ function streakOf(picks) {
   return s;
 }
 
+// Builds the four session files. Used by both the local download and the cloud upload.
+function buildExportFiles(base, status, forCloud) {
+  const files = [];
+  if (state.encodingLog.length > 0) {
+    files.push({ name: `${base}_encoding.csv`, content: rowsToCSV(state.encodingLog), mime: 'text/csv' });
+  }
+  if (state.shoppingLog.length > 0) {
+    files.push({ name: `${base}_shopping.csv`, content: rowsToCSV(state.shoppingLog), mime: 'text/csv' });
+  }
+  const summaryRows = buildSummaryRows();
+  if (summaryRows.length > 0) {
+    files.push({ name: `${base}_summary.csv`, content: rowsToCSV(summaryRows), mime: 'text/csv' });
+  }
+  const cfgOut = { ...cfg };
+  if (forCloud && !CLOUD.includeNotes) delete cfgOut.notes;
+  const meta = {
+    config: cfgOut, blockOrder: state.blockOrder,
+    metaResponses: state.metaResponses,
+    sessionStartUTC: new Date(state.sessionStart).toISOString(),
+    sessionStatus: status,
+    trialPlanSummary: state.trialPlan.filter(t => !t.blockBoundary).length,
+    practiceAttempts: state.practiceAttempts || 0
+  };
+  if (forCloud) meta.sessionKey = state.sessionKey;
+  files.push({ name: `${base}_config.json`, content: JSON.stringify(meta, null, 2), mime: 'application/json' });
+  return files;
+}
+
 function downloadAllCSVs(suffix = '') {
   const ts = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
   const base = `${cfg.participantId}_S${cfg.session}_${ts}${suffix ? '_' + suffix : ''}`;
-
-  // 1) Encoding log
-  if (state.encodingLog.length > 0) {
-    downloadFile(`${base}_encoding.csv`, rowsToCSV(state.encodingLog));
-  }
-  // 2) Shopping log
-  if (state.shoppingLog.length > 0) {
-    setTimeout(() => downloadFile(`${base}_shopping.csv`, rowsToCSV(state.shoppingLog)), 250);
-  }
-  // 3) Summary
-  const summaryRows = buildSummaryRows();
-  if (summaryRows.length > 0) {
-    setTimeout(() => downloadFile(`${base}_summary.csv`, rowsToCSV(summaryRows)), 500);
-  }
-  // 4) Config (so the run is fully reproducible)
-  setTimeout(() => downloadFile(`${base}_config.json`,
-    JSON.stringify({ config: cfg, blockOrder: state.blockOrder,
-                     metaResponses: state.metaResponses,
-                     sessionStartUTC: new Date(state.sessionStart).toISOString(),
-                     trialPlanSummary: state.trialPlan.filter(t => !t.blockBoundary).length },
-                   null, 2), 'application/json'), 750);
+  const files = buildExportFiles(base, suffix || 'MANUAL_DOWNLOAD', false);
+  files.forEach((f, i) => setTimeout(() => downloadFile(f.name, f.content, f.mime), i * 250));
 }
+
+// ============ CLOUD SAVE (Google Apps Script -> Google Drive) ============
+// Leave url and key empty to run exactly as before (local CSV downloads only).
+const CLOUD = {
+  url: 'https://script.google.com/macros/s/AKfycbwIXXUSjEUT2VkU-6rPe1MieH5rlxxNhzyJZi1GRwxNl7zOXfKYGojTTEnlnarOd5gF4g/exec',              // Web app URL from Apps Script (ends in /exec)
+  key: '5ZQxbssaj3tGsEgZxNf3H3lxDnpJaast1WsgOKGI',              // Same shared key as SHARED_KEY in Code.gs
+  includeNotes: false,  // false = the free-text Notes field is NOT uploaded
+  timeoutMs: 20000,
+  queueKey: 'shoppingGameUploadQueue_v1'
+};
+
+let cloudQueue = {};    // sessionKey -> newest snapshot not yet confirmed as saved
+let cloudPumpPromise = null;
+try { cloudQueue = JSON.parse(localStorage.getItem(CLOUD.queueKey) || '{}') || {}; }
+catch (e) { cloudQueue = {}; }
+
+function cloudEnabled() { return !!(CLOUD.url && CLOUD.key); }
+function safeName(s) { return String(s).replace(/[^A-Za-z0-9_-]/g, '_').slice(0, 120); }
+
+function makeSessionKey() {
+  const ts = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
+  return safeName(`${cfg.participantId}_S${cfg.session}_${ts}`);
+}
+
+function persistCloudQueue() {
+  try { localStorage.setItem(CLOUD.queueKey, JSON.stringify(cloudQueue)); } catch (e) {}
+}
+
+function cloudPayload(status) {
+  return {
+    key: CLOUD.key,
+    sessionKey: state.sessionKey,
+    status: status,
+    clientTimeUTC: new Date().toISOString(),
+    files: buildExportFiles(state.sessionKey, status, true)
+      .map(f => ({ name: f.name, content: f.content }))
+  };
+}
+
+async function cloudPost(payload) {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), CLOUD.timeoutMs);
+  let res;
+  try {
+    // No custom headers: the body goes as text/plain, which avoids a CORS preflight.
+    res = await fetch(CLOUD.url, {
+      method: 'POST', body: JSON.stringify(payload),
+      redirect: 'follow', signal: ctrl.signal
+    });
+  } catch (e) {
+    throw new Error(e && e.name === 'AbortError' ? 'timed out' : 'no connection');
+  } finally {
+    clearTimeout(timer);
+  }
+  if (!res.ok) throw new Error('server error ' + res.status);
+  let out;
+  try { out = await res.json(); }
+  catch (e) { throw new Error('unexpected reply, check the web app is deployed for "Anyone"'); }
+  if (!out || !out.ok) throw new Error((out && out.error) || 'upload rejected');
+  return out;
+}
+
+// Uploads every queued snapshot, one at a time. A newer snapshot for the same
+// session replaces an older one, so the queue stays small and order never matters.
+function cloudPump() {
+  if (cloudPumpPromise) return cloudPumpPromise;
+  cloudPumpPromise = (async () => {
+    const failed = new Set();
+    let lastErr = '';
+    try {
+      while (true) {
+        const keys = Object.keys(cloudQueue).filter(k => !failed.has(k));
+        if (!keys.length) break;
+        for (const k of keys) {
+          const p = cloudQueue[k];
+          if (!p) continue;
+          setCloudStatus('saving');
+          try {
+            await cloudPost(p);
+            if (cloudQueue[k] === p) { delete cloudQueue[k]; persistCloudQueue(); }
+          } catch (e) {
+            lastErr = e.message;
+            if (cloudQueue[k] === p) failed.add(k);   // newer snapshot waiting? send it next loop
+          }
+        }
+      }
+    } finally {
+      cloudPumpPromise = null;
+    }
+    const allSaved = Object.keys(cloudQueue).length === 0;
+    setCloudStatus(allSaved ? 'ok' : 'error', lastErr);
+    return allSaved;
+  })();
+  return cloudPumpPromise;
+}
+
+// Snapshot the whole session so far and send it. Never blocks or breaks the game.
+function cloudSave(status) {
+  if (!cloudEnabled() || !state.sessionKey) return Promise.resolve(null);
+  try {
+    cloudQueue[state.sessionKey] = cloudPayload(status);
+    persistCloudQueue();
+  } catch (e) {
+    console.warn('Cloud snapshot failed:', e);
+    return Promise.resolve(false);
+  }
+  return cloudPump().catch(e => { console.warn(e); return false; });
+}
+
+function retryCloud() { return cloudPump(); }
+
+async function testCloud() {
+  if (!cloudEnabled()) { setCloudStatus('off'); return; }
+  const el = document.getElementById('cloud-config-status');
+  if (el) { el.style.color = '#b8860b'; el.textContent = '\u2601 Testing connection...'; }
+  try {
+    const out = await cloudPost({ key: CLOUD.key, ping: true });
+    if (el) { el.style.color = '#2e7d4f';
+      el.textContent = '\u2601 Connection OK. Files will be saved to the Drive folder: ' + out.folder; }
+  } catch (e) {
+    if (el) { el.style.color = '#c0392b'; el.textContent = '\u26A0 Test failed: ' + e.message; }
+  }
+}
+
+function setCloudStatus(kind, msg) {
+  const pending = Object.keys(cloudQueue).length;
+  let text = '', color = '#888';
+  if (kind === 'off') {
+    text = '\u2601 Cloud saving is off (no endpoint set in the code)';
+  } else if (kind === 'idle') {
+    text = '\u2601 Cloud saving is on' + (pending ? ` (${pending} unsent session${pending > 1 ? 's' : ''})` : '');
+  } else if (kind === 'saving') {
+    text = '\u2601 Saving to cloud...'; color = '#b8860b';
+  } else if (kind === 'ok') {
+    text = '\u2601 Saved to cloud \u2713 ' + new Date().toLocaleTimeString(); color = '#2e7d4f';
+  } else if (kind === 'error') {
+    text = `\u26A0 Not saved to cloud yet (${msg || 'no connection'}). Data stays on this tablet and will retry. ` +
+           `Use "Download CSVs" as a backup.`;
+    color = '#c0392b';
+  }
+  ['cloud-status', 'cloud-config-status'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.textContent = text; el.style.color = color; }
+  });
+  const btn = document.getElementById('cloud-retry-btn');
+  if (btn) btn.style.display = (kind === 'error') ? '' : 'none';
+  const dot = document.getElementById('cloud-dot');
+  if (dot) {
+    dot.style.display = cloudEnabled() ? 'block' : 'none';
+    dot.style.background = { saving: '#e0a800', ok: '#2e7d4f', error: '#c0392b' }[kind] || '#bbb';
+  }
+}
+
+window.addEventListener('online', () => {
+  if (cloudEnabled() && Object.keys(cloudQueue).length) cloudPump();
+});
+setCloudStatus(cloudEnabled() ? 'idle' : 'off');
+if (cloudEnabled() && Object.keys(cloudQueue).length) cloudPump();
 
 // Prevent accidental gestures on tablet
 document.addEventListener('gesturestart', e => e.preventDefault());
