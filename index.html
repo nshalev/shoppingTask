@@ -2150,9 +2150,40 @@ function buildSummaryRows() {
     // Wall-clock vs active time totals
     const totalWallClock = trips.reduce((a, tr) => a + (tr.wallClockMs || tr.dwellMs || 0), 0);
     const totalActive = trips.reduce((a, tr) => a + (tr.activeTimeMs || tr.dwellMs || 0), 0);
-    // Count denied-access attempts for this trial (from encoding log)
+    // Count denied-access attempts for this trial (from encoding log).
+    // Matching on the time window as well as trialId keeps repeated practice attempts apart.
     const deniedAttempts = state.encodingLog.filter(
-      r => r.trialId === t.trialId && r.eventType === 'denied_access').length;
+      r => r.trialId === t.trialId && r.eventType === 'denied_access'
+        && (state.sessionStart + r.timestampAbsoluteMs) >= t.trialStart
+        && (state.sessionStart + r.timestampAbsoluteMs) <= t.trialEnd).length;
+
+    // ---- Search (store) time, kept separate from list time ----
+    // A store episode runs from trial start to the first list visit, between two
+    // list visits, or from the last list visit to trial end. A list visit still open
+    // when the trial ended (Done pressed on the list screen) is not a store episode.
+    const closedTrips = trips.slice().sort((a, b) => a.startMsInTrial - b.startMsInTrial);
+    const openTrip = (t._currentTripStart && t._currentTripStart.tripIndex > trips.length)
+      ? t._currentTripStart : null;
+    const storeEndMs = openTrip ? openTrip.startMsInTrial : (t.trialEnd - t.trialStart);
+    let storeGapMs = 0, nStoreEpisodes = 0, cursorMs = 0;
+    for (const tr of closedTrips) {
+      storeGapMs += Math.max(0, tr.startMsInTrial - cursorMs);
+      nStoreEpisodes++;
+      cursorMs = tr.endMsInTrial;
+    }
+    storeGapMs += Math.max(0, storeEndMs - cursorMs);
+    nStoreEpisodes++;
+    // Effort tap sequences happen in the store view. They count as effort, not search.
+    // Matching on the time window as well as trialId keeps repeated practice attempts apart.
+    const totalEffortMs = state.encodingLog
+      .filter(r => r.eventType === 'effort_sequence' && r.trialId === t.trialId
+        && (state.sessionStart + r.timestampAbsoluteMs) >= t.trialStart
+        && (state.sessionStart + r.timestampAbsoluteMs) <= t.trialEnd)
+      .reduce((a, r) => a + (r.wallClockMs || 0), 0);
+    const totalSearchMs = Math.max(0, storeGapMs - totalEffortMs);
+    const correctPicks = picks.filter(p => p.correct);
+    const meanRtCorrect = correctPicks.length
+      ? correctPicks.reduce((a, p) => a + p.rtMs, 0) / correctPicks.length : 0;
 
     rows.push({
       participantId: t.participantId,
@@ -2193,6 +2224,10 @@ function buildSummaryRows() {
       trialEndUTC: new Date(t.trialEnd).toISOString(),
       easierResponse: state.metaResponses.easier || '',
       preferredResponse: state.metaResponses.preferred || '',
+      totalSearchMs: Math.round(totalSearchMs),
+      meanSearchMsPerVisit: Math.round(totalSearchMs / nStoreEpisodes),
+      meanRtCorrectMs: Math.round(meanRtCorrect),
+      totalEffortMs: Math.round(totalEffortMs),
     });
   }
   return rows;
